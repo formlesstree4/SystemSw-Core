@@ -44,7 +44,6 @@ namespace SystemSw_UI.Controllers
             ec.ChangeChannel(port);
             await Task.Delay(100);
             return RedirectToAction("");
-            // return View(CreateModel());
         }
 
         [Route("Restart")]
