@@ -67,6 +67,8 @@ namespace SystemSw_Core.Extron.Devices
                 case ')':
                     break;
             }
+            if (text.Length <= 1) return;
+
             switch (text[1])
             {
                 case '!':

@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SystemSw_Core.Extron;
+using SystemSw_Core.Extron.Devices;
 using SystemSw_UI.Models;
 
 namespace SystemSw_UI
@@ -25,12 +27,16 @@ namespace SystemSw_UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<SystemSw_Core.Extron.ExtronCommunicator>((s) => 
+            services.AddSingleton<ICommunicationDevice>((s) => 
+            {
+                return new TestCommDevice();
+            });
+            services.AddSingleton<ExtronCommunicator>((s) => 
             {
                 var config = s.GetRequiredService<IConfiguration>();
                 var settings = new ExtronSettings();
                 config.GetSection("Extron").Bind(settings);
-                return new SystemSw_Core.Extron.ExtronCommunicator(settings.Port, true, settings.ReadTimeout);
+                return new SystemSw_Core.Extron.ExtronCommunicator(s.GetRequiredService<ICommunicationDevice>(), true);
             });
             services.AddControllersWithViews();
         }

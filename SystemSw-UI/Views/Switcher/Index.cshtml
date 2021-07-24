@@ -3,16 +3,14 @@
     ViewData["Title"] = "Switcher";
 }
 
-<table class="text-center">
-    @foreach (var item in Model.Mappings) {
-        <tr>
-            <td>
-                @Html.ActionLink(item.Value, "Switch", new { port = item.Key }, htmlAttributes: new
-                {
-                    style = int.Parse(item.Key) == Model.ActiveChannel ? "font-weight:bold;" : ""    
-                });
-            </td>
-        </tr>
+<div class="container text-center">
+    @foreach (var item in Model.Mappings.Take(Model.Channels)) {
+        <div class="row">
+            @Html.ActionLink(item.Value, "Switch", new { port = item.Key }, htmlAttributes: new
+            {
+                style = int.Parse(item.Key) == Model.ActiveChannel ? "font-weight:bold;" : ""    
+            });
+        </div>
     }
     <tr>
         <td>
