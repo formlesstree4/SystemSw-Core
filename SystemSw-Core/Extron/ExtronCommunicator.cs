@@ -322,7 +322,7 @@ namespace SystemSw_Core.Extron
                 case 'V':
                 case 'v':
                     // Identify can also affect this command
-                    if (response.Length > 3)
+                    if (response.Length > 4)
                     {
                         HandleIdentifyString(response);
                     }
