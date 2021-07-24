@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +14,7 @@ namespace SystemSw_Core.Extron
     /// The code written here was based off the RS-232 programming guide located on pages A-3, A-4, and A-5.
     /// I will not be providing a copy of the manual as it can be found on Extron's website.
     /// </remarks>
-    public sealed class ExtronCommunicator
+    public sealed class ExtronCommunicator : IDisposable
     {
         private CancellationTokenSource source;
         private Task readLoop;
@@ -227,7 +225,10 @@ namespace SystemSw_Core.Extron
             Write(muted ? "+" : "-");
         }
 
-
+        public void Dispose()
+        {
+            com.Dispose();
+        }
 
         /// <summary>
         /// Polls the serial port for incoming data
@@ -414,7 +415,6 @@ namespace SystemSw_Core.Extron
             }
             return $"Unknown Error Code {errorCode}";
         }
-
 
     }
 
