@@ -13,8 +13,10 @@ namespace SystemSw_Core.Extron.Devices
         private readonly SerialPort sp;
         private readonly Stack<string> history;
 
+
         public bool IsOpen => sp.IsOpen;
 
+        public Stack<string> History => history;
 
 
         /// <summary>
