@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SystemSw_Core.Extron
+namespace SystemSw_Core.Extron.Devices
 {
 
     /// <summary>

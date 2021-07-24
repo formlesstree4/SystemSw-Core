@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SystemSw_Core.Extron.Devices;
 
 namespace SystemSw_Core.Extron
 {
@@ -17,22 +18,10 @@ namespace SystemSw_Core.Extron
     /// </remarks>
     public sealed class ExtronCommunicator
     {
-
-        private Stack<string> history;
-        private string lastReceivedResponse;
         private CancellationTokenSource source;
         private Task readLoop;
+        private readonly ICommunicationDevice com;
 
-
-        /// <summary>
-        /// Gets the Serial Port that the communicator is utilizing
-        /// </summary>
-        public string SerialPortAddress { get; init; }
-
-        /// <summary>
-        /// Gets the actual <see cref="SerialPort"/> used to communicate with the Extron device
-        /// </summary>
-        public SerialPort SerialPort { get; init; }
 
         /// <summary>
         /// Gets the number of channels that the connected system supports
@@ -97,25 +86,11 @@ namespace SystemSw_Core.Extron
         /// <summary>
         /// Creates a new instance of the <see cref="ExtronCommunicator"/> for the given serial port
         /// </summary>
-        /// <param name="serialPort">The address of the serial port</param>
+        /// <param name="com">The device interface to communicate with</param>
         /// <param name="open">Immediately invoke <see cref="OpenConnection"/> if true</param>
-        /// <param name="readTimeout">How fast the <see cref="System.IO.Ports.SerialPort"/> class will timeout a read operation</param>
-        public ExtronCommunicator(
-            string serialPort, bool open = false, int readTimeout = 1000)
+        public ExtronCommunicator(ICommunicationDevice com, bool open)
         {
-            SerialPortAddress = serialPort;
-            SerialPort = new SerialPort(serialPort)
-            {
-                BaudRate = 9600,
-                Parity = Parity.None,
-                StopBits = StopBits.One,
-                DataBits = 8,
-                Handshake = Handshake.None,
-                DtrEnable = true,
-                RtsEnable = false
-            };
-            lastReceivedResponse = "";
-            history = new Stack<string>();
+            this.com = com ?? throw new ArgumentNullException(nameof(com));
             if (open)
             {
                 OpenConnection();
@@ -135,8 +110,8 @@ namespace SystemSw_Core.Extron
         /// <exception cref="System.IO.IOException"/>
         public void OpenConnection(bool doNotIdentify = false)
         {
-            if (SerialPort.IsOpen) return;
-            SerialPort.Open();
+            if (com.IsOpen) return;
+            com.Open();
             source = new CancellationTokenSource();
             readLoop = Task.Run(InternalReadLoop);
             if (!doNotIdentify) Identify();
@@ -147,20 +122,10 @@ namespace SystemSw_Core.Extron
         /// </summary>
         public void CloseConnection()
         {
-            SerialPort.Close();
+            com.Close();
             source.Cancel();
             readLoop.Dispose();
         }
-
-        /// <summary>
-        /// Ensures the input and output buffers are clean
-        /// </summary>
-        public void FlushBuffers()
-        {
-            SerialPort.DiscardInBuffer();
-            SerialPort.DiscardOutBuffer();
-        }
-
 
         /// <summary>
         /// Identifies what the connected system is and sets up initial settings.
@@ -273,7 +238,7 @@ namespace SystemSw_Core.Extron
             {
                 try
                 {
-                    var dataLine = SerialPort.ReadLine();
+                    var dataLine = com.ReadLine();
                     if (!string.IsNullOrEmpty(dataLine))
                     {
                         HandleIncomingResponse(dataLine);
@@ -297,8 +262,7 @@ namespace SystemSw_Core.Extron
         private void HandleIncomingResponse(string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
-            history.Push($"< {response}");
-            
+
             // let's handle all the permutations I care about
             switch (response[0])
             {
@@ -425,8 +389,7 @@ namespace SystemSw_Core.Extron
         /// <param name="command">The command to write</param>
         private void Write(string command)
         {
-            SerialPort.Write(command);
-            history.Push("> {command}");
+            com.Write(command);
         }
 
         private bool IsResponseError(string response)
