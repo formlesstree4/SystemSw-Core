@@ -1,0 +1,12 @@
+ul {
+    list-style-type: none;
+    border: 1px solid black;
+}
+
+li {
+    text-align: center;
+}
+
+li.selected {
+    font-weight: bolder;   
+}

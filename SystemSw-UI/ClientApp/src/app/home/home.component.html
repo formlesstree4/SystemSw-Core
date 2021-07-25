@@ -1,17 +1,16 @@
 <div class="container">
 
-  <div *ngFor="let mapping of SwitchMappings">
-
+  <ul *ngFor="let mapping of SwitchMappings">
 
     <ng-template [ngIf]="mapping.isActiveChannel">
-      <div (click)="updateSwitcherMapping(mapping)" style="font-style: italic;">{{mapping.channelName}}</div>
+      <li class="selected" (click)="updateSwitcherMapping(mapping)">{{mapping.channelName}}</li>
     </ng-template>
 
     <ng-template [ngIf]="!mapping.isActiveChannel">
-      <div (click)="updateSwitcherMapping(mapping)">{{mapping.channelName}}</div>
+      <li (click)="updateSwitcherMapping(mapping)">{{mapping.channelName}}</li>
     </ng-template>
     
-  </div>
+  </ul>
 
 
 </div>

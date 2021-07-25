@@ -1,14 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription, timer } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-
+export class HomeComponent implements OnInit, OnDestroy {
   ApiUrl: string;
   public SwitchMappings: ExtronMappedEntry[] = [];
 
@@ -18,6 +19,11 @@ export class HomeComponent {
 
   ngOnInit() {
     this.getSwitcherMappings();
+    
+  }
+
+  ngOnDestroy() {
+
   }
 
   getSwitcherMappings() {
