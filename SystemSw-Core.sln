@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemSw-UI", "SystemSw-UI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemSw-Api", "SystemSw-Api\SystemSw-Api.csproj", "{CAB5EF67-7E8B-433E-99B3-3F0A57845676}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemSw-Tests", "SystemSw-Tests\SystemSw-Tests.csproj", "{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
