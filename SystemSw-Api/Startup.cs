@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using SystemSw_Api.Models;
 using SystemSw_Core.Extron;
 using SystemSw_Core.Extron.Devices;
 
@@ -27,7 +27,20 @@ namespace SystemSw_Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SystemSW WebAPI", Version = "v1" });
             });
-            services.AddSingleton<ICommunicationDevice, TestCommDevice>();
+            services.AddSingleton<ICommunicationDevice>((provider) => 
+            {
+                var config = provider.GetRequiredService<IConfiguration>();
+                var extronCfg = new ExtronConfiguration();
+                config.GetSection("Extron").Bind(extronCfg);
+                if (extronCfg.Type.Equals("serial", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return new SerialCommunicationDevice(extronCfg.Port, true, extronCfg.ReadTimeout);
+                }
+                else
+                {
+                    return new TestCommDevice();
+                }
+            });
             services.AddSingleton<ExtronCommunicator>(s => new ExtronCommunicator(s.GetRequiredService<ICommunicationDevice>(), true));
         }
 
