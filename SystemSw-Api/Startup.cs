@@ -34,7 +34,7 @@ namespace SystemSw_Api
                 config.GetSection("Extron").Bind(extronCfg);
                 if (extronCfg.Type.Equals("serial", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    return new SerialCommunicationDevice(extronCfg.Port, true, extronCfg.ReadTimeout);
+                    return new SerialCommunicationDevice(extronCfg.Port, false, extronCfg.ReadTimeout);
                 }
                 else
                 {

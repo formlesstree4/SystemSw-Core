@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
     this.getSwitcherMappings();
   }
 
-  private getSwitcherMappings(): void {
+  getSwitcherMappings(): void {
     var endpoint = this.ApiUrl + 'switcher';
     this.http.get<ExtronMappedEntry[]>(endpoint).subscribe((c : ExtronMappedEntry[]) => {
       console.log(c);

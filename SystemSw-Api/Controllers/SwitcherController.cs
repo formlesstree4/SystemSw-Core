@@ -47,6 +47,7 @@ namespace SystemSw_Api.Controllers
         private IEnumerable<ExtronMappedEntry> GetExtronMappings()
         {
             var coll = new List<ExtronMappedEntry>();
+            logger.LogInformation($"Generating Mappings for {ec.Channels} entries");
             for (var c = 0; c < ec.Channels; c++)
             {
                 var cs = (c + 1).ToString();
