@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription, timer } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
 
@@ -9,24 +8,21 @@ import { environment } from 'src/environments/environment';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit {
   ApiUrl: string;
   public SwitchMappings: ExtronMappedEntry[] = [];
 
-  constructor(private http: HttpClient) {
-    this.ApiUrl = environment.api;
+  constructor(
+    private http: HttpClient) {
+    this.ApiUrl = '';
   }
 
   ngOnInit() {
+    this.computeApiUrl();
     this.getSwitcherMappings();
-    
   }
 
-  ngOnDestroy() {
-
-  }
-
-  getSwitcherMappings() {
+  private getSwitcherMappings(): void {
     var endpoint = this.ApiUrl + 'switcher';
     this.http.get<ExtronMappedEntry[]>(endpoint).subscribe((c : ExtronMappedEntry[]) => {
       console.log(c);
@@ -34,7 +30,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateSwitcherMapping(mapping: ExtronMappedEntry) {
+  private computeApiUrl(): void {
+    this.ApiUrl = 'http://' + document.location.hostname + ':' + environment.api.toString() + '/';
+  }
+
+  updateSwitcherMapping(mapping: ExtronMappedEntry): void {
     var endpoint = this.ApiUrl + 'switcher';
     this.http.post<ExtronMappedEntry[]>(endpoint, mapping).subscribe((c: ExtronMappedEntry[]) => {
       this.SwitchMappings = c;
