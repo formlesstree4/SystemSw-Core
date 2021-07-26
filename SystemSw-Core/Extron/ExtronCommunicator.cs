@@ -337,8 +337,8 @@ namespace SystemSw_Core.Extron
             /*
                 The response to identifying is as follows:
 
-                [0] Vx      - Video and Channel Number
-                [1] Ax      - Audio and Channel Number
+                [0] Vx      - Video Channel Number
+                [1] Ax      - Audio Channel Number
                 [2] Tx      - Video Type (Enum)
                 [3] Px      - Projector Power status
                 [4] Sx      - Projector Display (muted) status
