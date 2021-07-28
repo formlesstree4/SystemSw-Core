@@ -82,6 +82,11 @@ namespace SystemSw_Core.Extron
         /// </summary>
         public string ProjectorFirmwareVersion { get; private set; }
 
+        /// <summary>
+        /// Gets whether or not the current connection is open
+        /// </summary>
+        public bool IsConnectionOpen => com.IsOpen;
+
 
 
         /// <summary>
@@ -278,8 +283,8 @@ namespace SystemSw_Core.Extron
             {
                 case 'C':
                 case 'c':
-                    AudioChannel = int.Parse(response.Substring(1));
-                    VideoChannel = AudioChannel;
+                    VideoChannel = int.Parse(response[1..]);
+                    AudioChannel = int.Parse(response[1..]);
                     break;
                 case 'A':
                 case 'a':
@@ -290,7 +295,7 @@ namespace SystemSw_Core.Extron
                     }
                     else
                     {
-                        AudioChannel = int.Parse(response.Substring(1));
+                        AudioChannel = int.Parse(response[1..]);
                     }
                     break;
                 case 'V':
@@ -302,7 +307,7 @@ namespace SystemSw_Core.Extron
                     }
                     else
                     {
-                        VideoChannel = int.Parse(response.Substring(1));
+                        VideoChannel = int.Parse(response[1..]);
                     }
                     break;
                 case 'B':
@@ -313,11 +318,11 @@ namespace SystemSw_Core.Extron
                 case 'q':
                     if (response.StartsWith("qsc", StringComparison.OrdinalIgnoreCase))
                     {
-                        SwitcherFirmwareVersion = response.Substring(3);
+                        SwitcherFirmwareVersion = response[3..];
                     }
                     else
                     {
-                        ProjectorFirmwareVersion = response.Substring(3);
+                        ProjectorFirmwareVersion = response[3..];
                     }
                     break;
                 case 'M':
@@ -357,40 +362,40 @@ namespace SystemSw_Core.Extron
                 [8] QPCx.xx - Switcher Projector Firmware Version
                 [9] Mx      - Maximum Channels
              */
-            if (int.TryParse(responseArray[9].Substring(1), out var mc))
+            if (int.TryParse(responseArray[9][1..], out var mc))
             {
                 Channels = mc;
             }
-            if (int.TryParse(responseArray[0].Substring(1), out var vc))
+            if (int.TryParse(responseArray[0][1..], out var vc))
             {
                 VideoChannel = vc;
             }
-            if (int.TryParse(responseArray[1].Substring(1), out var ac))
+            if (int.TryParse(responseArray[1][1..], out var ac))
             {
-                AudioChannel = vc;
+                AudioChannel = ac;
             }
-            if (Enum.TryParse<VideoTypeEnum>(responseArray[2].Substring(1), out var vte))
+            if (Enum.TryParse<VideoTypeEnum>(responseArray[2][1..], out var vte))
             {
                 VideoType = vte;
             }
-            if (int.TryParse(responseArray[3].Substring(1), out var pps))
+            if (int.TryParse(responseArray[3][1..], out var pps))
             {
                 IsProjecterPowered = pps == 1;
             }
-            if (int.TryParse(responseArray[4].Substring(1), out var pds))
+            if (int.TryParse(responseArray[4][1..], out var pds))
             {
                 IsProjectorMuted = pds == 1;
             }
-            if (int.TryParse(responseArray[5].Substring(1), out var sm))
+            if (int.TryParse(responseArray[5][1..], out var sm))
             {
                 IsAudioMuted = sm == 1;
             }
-            if (int.TryParse(responseArray[6].Substring(1), out var rgbm))
+            if (int.TryParse(responseArray[6][1..], out var rgbm))
             {
                 IsRgbMuted = rgbm == 1;
             }
-            SwitcherFirmwareVersion = responseArray[7].Substring(3);
-            ProjectorFirmwareVersion = responseArray[8].Substring(3);
+            SwitcherFirmwareVersion = responseArray[7][3..];
+            ProjectorFirmwareVersion = responseArray[8][3..];
         }
 
         /// <summary>

@@ -14,52 +14,68 @@ namespace SystemSw_Tests
     public class ExtronCommunicatorTests
     {
 
-        private readonly IConfiguration configuration;
         private readonly ILogger<ExtronCommunicator> logger;
 
 
         public ExtronCommunicatorTests()
         {
-            configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", false, true)
-                .Build();
             logger = new NullLogger<ExtronCommunicator>();
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "When 'IsOpen' is true (in CFG) the device should be opened")]
         public void Test_OpenWhenFlagIsSetToTrue()
         {
             var isOpened = false;
             var icd = new Mock<ICommunicationDevice>();
             icd.Setup((c) => c.Open()).Callback(() => { isOpened = true; });
-            var ec = new ExtronCommunicator(icd.Object, logger, configuration);
+            var ec = new ExtronCommunicator(icd.Object, logger, GetConfiguration(true));
             Assert.True(isOpened);
+            Assert.True(ec.IsConnectionOpen);
+            ec.Dispose();
         }
 
+        [Fact(DisplayName = "When 'IsOpen' is false (in CFG) the device should not be opened")]
+        public void Test_ClosedWhenFlagIsSetToFalse()
+        {
+            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(false));
+            Assert.False(ec.IsConnectionOpen);
+        }
 
-        // [Fact]
+        [Fact(DisplayName = "Verification string is parsed accordingly for System 8/10")]
         public async Task Test_VerificationStringIsParsedCorrectly()
         {
             var rnd = new Random();
-
-            var channelCount = rnd.Next(1, 14);
+            var channelCount = rnd.Next(8, 11);
             var vidChannel = rnd.Next(1, channelCount - 1);
             var audChannel = rnd.Next(1, channelCount - 1);
+            var qscVersion = rnd.Next(10, 99);
+            var qpcVersion = rnd.Next(10, 99);
+            var identifyString = $"V{vidChannel} A{audChannel} T1 P0 S0 Z0 R0 QSC1.{qscVersion} QPC1.{qpcVersion} M{channelCount}";
+            var icd = new Fakes.FakeCommunicationDevice(identifyString);
+            var ec = new ExtronCommunicator(icd, logger, GetConfiguration(false));
             
-            var identifyString = $"V{vidChannel} A{audChannel} T1 P0 S0 Z0 R0 QSC1.11 QPC1.11 M{channelCount}";
+            ec.OpenConnection(true);
+            ec.Identify();
 
-            var icd = new Mock<ICommunicationDevice>();
-            icd.Setup(c => c.ReadLine()).Returns(identifyString);
-            
-            //var ec = new ExtronCommunicator(icd.Object, false);
-            //ec.OpenConnection(true);
-            //ec.Identify();
+            await Task.Delay(100);
 
+            Assert.Equal(vidChannel, ec.VideoChannel);
+            Assert.Equal(audChannel, ec.AudioChannel);
+            Assert.Equal(channelCount, ec.Channels);
+            Assert.Equal($"1.{qscVersion}", ec.SwitcherFirmwareVersion);
+            Assert.Equal($"1.{qpcVersion}", ec.ProjectorFirmwareVersion);
 
-            //Assert.Equal(vidChannel, ec.VideoChannel);
-            //Assert.Equal(audChannel, ec.AudioChannel);
-            //Assert.Equal(channelCount, ec.Channels);
+            ec.Dispose();
         }
+
+        private static IConfiguration GetConfiguration(bool autoload)
+        {
+            var filename = autoload ? "appsettings.json" : "appsettings.noautoload.json";
+            return new ConfigurationBuilder()
+                .AddJsonFile(filename, false, true)
+                .Build();
+        }
+
     }
 }
