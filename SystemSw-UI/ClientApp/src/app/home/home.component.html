@@ -1,0 +1,22 @@
+<div class="container">
+
+  <ul *ngFor="let mapping of SwitchMappings">
+
+    <ng-template [ngIf]="mapping.isActiveChannel">
+      <li class="selected" (click)="updateSwitcherMapping(mapping)">{{mapping.channelName}}</li>
+    </ng-template>
+
+    <ng-template [ngIf]="!mapping.isActiveChannel">
+      <li (click)="updateSwitcherMapping(mapping)">{{mapping.channelName}}</li>
+    </ng-template>
+    
+  </ul>
+
+  <hr />
+
+  <ul>
+    <li (click)="getSwitcherMappings()">Refresh</li>
+  </ul>
+
+
+</div>

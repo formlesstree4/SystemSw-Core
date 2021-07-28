@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Ports;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SystemSw_Core.Extron.Devices;
 
 namespace SystemSw_Core.Extron
 {
@@ -15,24 +16,13 @@ namespace SystemSw_Core.Extron
     /// The code written here was based off the RS-232 programming guide located on pages A-3, A-4, and A-5.
     /// I will not be providing a copy of the manual as it can be found on Extron's website.
     /// </remarks>
-    public sealed class ExtronCommunicator
+    public sealed class ExtronCommunicator : IDisposable
     {
-
-        private Stack<string> history;
-        private string lastReceivedResponse;
         private CancellationTokenSource source;
         private Task readLoop;
+        private readonly ICommunicationDevice com;
+        private readonly ILogger<ExtronCommunicator> logger;
 
-
-        /// <summary>
-        /// Gets the Serial Port that the communicator is utilizing
-        /// </summary>
-        public string SerialPortAddress { get; init; }
-
-        /// <summary>
-        /// Gets the actual <see cref="SerialPort"/> used to communicate with the Extron device
-        /// </summary>
-        public SerialPort SerialPort { get; init; }
 
         /// <summary>
         /// Gets the number of channels that the connected system supports
@@ -92,34 +82,27 @@ namespace SystemSw_Core.Extron
         /// </summary>
         public string ProjectorFirmwareVersion { get; private set; }
 
+        /// <summary>
+        /// Gets whether or not the current connection is open
+        /// </summary>
+        public bool IsConnectionOpen => com.IsOpen;
+
 
 
         /// <summary>
         /// Creates a new instance of the <see cref="ExtronCommunicator"/> for the given serial port
         /// </summary>
-        /// <param name="serialPort">The address of the serial port</param>
+        /// <param name="com">The device interface to communicate with</param>
         /// <param name="open">Immediately invoke <see cref="OpenConnection"/> if true</param>
-        /// <param name="readTimeout">How fast the <see cref="System.IO.Ports.SerialPort"/> class will timeout a read operation</param>
         public ExtronCommunicator(
-            string serialPort, bool open = false, int readTimeout = 1000)
+            ICommunicationDevice com,
+            ILogger<ExtronCommunicator> logger,
+            IConfiguration configuration
+            )
         {
-            SerialPortAddress = serialPort;
-            SerialPort = new SerialPort(serialPort)
-            {
-                BaudRate = 9600,
-                Parity = Parity.None,
-                StopBits = StopBits.One,
-                DataBits = 8,
-                Handshake = Handshake.None,
-                DtrEnable = true,
-                RtsEnable = false
-            };
-            lastReceivedResponse = "";
-            history = new Stack<string>();
-            if (open)
-            {
-                OpenConnection();
-            }
+            this.com = com ?? throw new ArgumentNullException(nameof(com));
+            this.logger = logger;
+            this.HandleAutoOpen(configuration);
         }
 
 
@@ -135,8 +118,8 @@ namespace SystemSw_Core.Extron
         /// <exception cref="System.IO.IOException"/>
         public void OpenConnection(bool doNotIdentify = false)
         {
-            if (SerialPort.IsOpen) return;
-            SerialPort.Open();
+            if (com.IsOpen) return;
+            com.Open();
             source = new CancellationTokenSource();
             readLoop = Task.Run(InternalReadLoop);
             if (!doNotIdentify) Identify();
@@ -147,20 +130,10 @@ namespace SystemSw_Core.Extron
         /// </summary>
         public void CloseConnection()
         {
-            SerialPort.Close();
+            com.Close();
             source.Cancel();
             readLoop.Dispose();
         }
-
-        /// <summary>
-        /// Ensures the input and output buffers are clean
-        /// </summary>
-        public void FlushBuffers()
-        {
-            SerialPort.DiscardInBuffer();
-            SerialPort.DiscardOutBuffer();
-        }
-
 
         /// <summary>
         /// Identifies what the connected system is and sets up initial settings.
@@ -262,7 +235,10 @@ namespace SystemSw_Core.Extron
             Write(muted ? "+" : "-");
         }
 
-
+        public void Dispose()
+        {
+            com.Dispose();
+        }
 
         /// <summary>
         /// Polls the serial port for incoming data
@@ -273,7 +249,7 @@ namespace SystemSw_Core.Extron
             {
                 try
                 {
-                    var dataLine = SerialPort.ReadLine();
+                    var dataLine = com.ReadLine();
                     if (!string.IsNullOrEmpty(dataLine))
                     {
                         HandleIncomingResponse(dataLine);
@@ -281,11 +257,12 @@ namespace SystemSw_Core.Extron
                 }
                 catch (TimeoutException)
                 {
-                    // no worries   
+                    // no worries  
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // something has gone horribly wrong [!]
+                    logger.LogError(ex, "An error occurred reading from the stream");
                 }
             }
         }
@@ -294,18 +271,20 @@ namespace SystemSw_Core.Extron
         /// Handles the incoming response message
         /// </summary>
         /// <param name="response">The response string to interpret</param>
+        /// <remarks>
+        /// This is not an exact implementation of every response code that the Extron system can send back. Since I currently do not use all the features
+        /// </remarks>
         private void HandleIncomingResponse(string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
-            history.Push($"< {response}");
-            
+
             // let's handle all the permutations I care about
             switch (response[0])
             {
                 case 'C':
                 case 'c':
-                    AudioChannel = int.Parse(response.Substring(1));
-                    VideoChannel = AudioChannel;
+                    VideoChannel = int.Parse(response[1..]);
+                    AudioChannel = int.Parse(response[1..]);
                     break;
                 case 'A':
                 case 'a':
@@ -316,19 +295,19 @@ namespace SystemSw_Core.Extron
                     }
                     else
                     {
-                        AudioChannel = int.Parse(response.Substring(1));
+                        AudioChannel = int.Parse(response[1..]);
                     }
                     break;
                 case 'V':
                 case 'v':
                     // Identify can also affect this command
-                    if (response.Length > 3)
+                    if (response.Length > 4)
                     {
                         HandleIdentifyString(response);
                     }
                     else
                     {
-                        VideoChannel = int.Parse(response.Substring(1));
+                        VideoChannel = int.Parse(response[1..]);
                     }
                     break;
                 case 'B':
@@ -339,11 +318,11 @@ namespace SystemSw_Core.Extron
                 case 'q':
                     if (response.StartsWith("qsc", StringComparison.OrdinalIgnoreCase))
                     {
-                        SwitcherFirmwareVersion = response.Substring(3);
+                        SwitcherFirmwareVersion = response[3..];
                     }
                     else
                     {
-                        ProjectorFirmwareVersion = response.Substring(3);
+                        ProjectorFirmwareVersion = response[3..];
                     }
                     break;
                 case 'M':
@@ -372,8 +351,8 @@ namespace SystemSw_Core.Extron
             /*
                 The response to identifying is as follows:
 
-                [0] Vx      - Video and Channel Number
-                [1] Ax      - Audio and Channel Number
+                [0] Vx      - Video Channel Number
+                [1] Ax      - Audio Channel Number
                 [2] Tx      - Video Type (Enum)
                 [3] Px      - Projector Power status
                 [4] Sx      - Projector Display (muted) status
@@ -383,40 +362,40 @@ namespace SystemSw_Core.Extron
                 [8] QPCx.xx - Switcher Projector Firmware Version
                 [9] Mx      - Maximum Channels
              */
-            if (int.TryParse(responseArray[9].Substring(1), out var mc))
+            if (int.TryParse(responseArray[9][1..], out var mc))
             {
                 Channels = mc;
             }
-            if (int.TryParse(responseArray[0].Substring(1), out var vc))
+            if (int.TryParse(responseArray[0][1..], out var vc))
             {
                 VideoChannel = vc;
             }
-            if (int.TryParse(responseArray[1].Substring(1), out var ac))
+            if (int.TryParse(responseArray[1][1..], out var ac))
             {
-                AudioChannel = vc;
+                AudioChannel = ac;
             }
-            if (Enum.TryParse<VideoTypeEnum>(responseArray[2].Substring(1), out var vte))
+            if (Enum.TryParse<VideoTypeEnum>(responseArray[2][1..], out var vte))
             {
                 VideoType = vte;
             }
-            if (int.TryParse(responseArray[3].Substring(1), out var pps))
+            if (int.TryParse(responseArray[3][1..], out var pps))
             {
                 IsProjecterPowered = pps == 1;
             }
-            if (int.TryParse(responseArray[4].Substring(1), out var pds))
+            if (int.TryParse(responseArray[4][1..], out var pds))
             {
                 IsProjectorMuted = pds == 1;
             }
-            if (int.TryParse(responseArray[5].Substring(1), out var sm))
+            if (int.TryParse(responseArray[5][1..], out var sm))
             {
                 IsAudioMuted = sm == 1;
             }
-            if (int.TryParse(responseArray[6].Substring(1), out var rgbm))
+            if (int.TryParse(responseArray[6][1..], out var rgbm))
             {
                 IsRgbMuted = rgbm == 1;
             }
-            SwitcherFirmwareVersion = responseArray[7].Substring(3);
-            ProjectorFirmwareVersion = responseArray[8].Substring(3);
+            SwitcherFirmwareVersion = responseArray[7][3..];
+            ProjectorFirmwareVersion = responseArray[8][3..];
         }
 
         /// <summary>
@@ -425,9 +404,9 @@ namespace SystemSw_Core.Extron
         /// <param name="command">The command to write</param>
         private void Write(string command)
         {
-            SerialPort.Write(command);
-            history.Push("> {command}");
+            com.Write(command);
         }
+
 
         private bool IsResponseError(string response)
         {
@@ -452,6 +431,17 @@ namespace SystemSw_Core.Extron
             return $"Unknown Error Code {errorCode}";
         }
 
+        private void HandleAutoOpen(IConfiguration configuration)
+        {
+            var extronNode = configuration.GetSection("Extron");
+            if (extronNode is null) return;
+            var autoOpenFlag = extronNode["AutoOpen"];
+            if (autoOpenFlag is null) return;
+            if (bool.TryParse(autoOpenFlag, out var ao) && ao)
+            {
+                OpenConnection();
+            }
+        }
 
     }
 
