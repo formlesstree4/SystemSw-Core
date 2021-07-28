@@ -83,16 +83,16 @@ namespace SystemSw_Tests.Fakes
             }
             if (text.Length <= 1) return;
 
-            switch (text[1])
+            switch (text.Last())
             {
                 case '!':
-                    response = $"C{text[0]}";
+                    response = $"C{text[0..^1]}";
                     break;
                 case '&':
-                    response = $"V{text[0]}";
+                    response = $"V{text[0..^1]}";
                     break;
                 case '$':
-                    response = $"A{text[0]}";
+                    response = $"A{text[0..^1]}";
                     break;
             }
         }
