@@ -262,7 +262,7 @@ namespace SystemSw_Core.Extron
                 catch (Exception ex)
                 {
                     // something has gone horribly wrong [!]
-                    
+                    logger.LogError(ex, "An error occurred reading from the stream");
                 }
             }
         }
