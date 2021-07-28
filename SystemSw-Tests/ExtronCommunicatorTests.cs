@@ -23,19 +23,12 @@ namespace SystemSw_Tests
         }
 
 
-        [Fact(DisplayName = "When 'IsOpen' is true (in CFG) the device should be opened")]
-        public void Test_OpenWhenFlagIsSetToTrue()
+        [Theory(DisplayName = "The value of 'shouldBeOpen' will determine the initial state of the connection")]
+        [InlineData(true), InlineData(false)]
+        public void Test_OpenWhenFlagIsSetToTrue(bool shouldBeOpen)
         {
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
-            Assert.True(ec.IsConnectionOpen);
-            ec.Dispose();
-        }
-
-        [Fact(DisplayName = "When 'IsOpen' is false (in CFG) the device should not be opened")]
-        public void Test_ClosedWhenFlagIsSetToFalse()
-        {
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(false));
-            Assert.False(ec.IsConnectionOpen);
+            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(shouldBeOpen));
+            Assert.Equal(shouldBeOpen, ec.IsConnectionOpen);
         }
 
         [Fact(DisplayName = "Verification string is parsed accordingly for System 8/10")]
