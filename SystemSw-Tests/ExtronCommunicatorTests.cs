@@ -26,11 +26,7 @@ namespace SystemSw_Tests
         [Fact(DisplayName = "When 'IsOpen' is true (in CFG) the device should be opened")]
         public void Test_OpenWhenFlagIsSetToTrue()
         {
-            var isOpened = false;
-            var icd = new Mock<ICommunicationDevice>();
-            icd.Setup((c) => c.Open()).Callback(() => { isOpened = true; });
-            var ec = new ExtronCommunicator(icd.Object, logger, GetConfiguration(true));
-            Assert.True(isOpened);
+            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
             Assert.True(ec.IsConnectionOpen);
             ec.Dispose();
         }
