@@ -56,7 +56,7 @@ namespace SystemSw_Tests
             Assert.Equal($"1.{qpcVersion}", ec.ProjectorFirmwareVersion);
         }
 
-        [Theory(DisplayName = "Audio ${audioChannel} and Video ${videoChannel} channels can be changed independent")]
+        [Theory(DisplayName = "Audio and Video channels can be switched independently")]
         [InlineData(2, 2), InlineData(2, 3), InlineData(3, 2)]
         public async Task Theory_HandleSimpleChannelSwitching(int audioChannel, int videoChannel)
         {
@@ -69,6 +69,21 @@ namespace SystemSw_Tests
             Assert.Equal(audioChannel, ec.AudioChannel);
             Assert.Equal(videoChannel, ec.VideoChannel);
         }
+
+        [Theory(DisplayName = "Audio and Video channels can be switched at the same time")]
+        [InlineData(1), InlineData(3)]
+        public async Task Theory_HandleSwitchingAudioAndVideo(int channel)
+        {
+            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
+            await Task.Delay(150);
+            ec.ChangeChannel(channel);
+            await Task.Delay(150);
+            await Task.Delay(150);
+            Assert.Equal(channel, ec.AudioChannel);
+            Assert.Equal(channel, ec.VideoChannel);
+        }
+
+
 
         private static IConfiguration GetConfiguration(bool autoload)
         {
