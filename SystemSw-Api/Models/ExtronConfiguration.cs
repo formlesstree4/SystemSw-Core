@@ -6,5 +6,6 @@ namespace SystemSw_Api.Models
         public int ReadTimeout { get; set; }
         public int WriteTimeout { get; set; }
         public string Type { get; set; }
+        public bool AutoOpen { get; set; }
     }
 }

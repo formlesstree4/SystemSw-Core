@@ -41,7 +41,7 @@ namespace SystemSw_Api
                     return new TestCommDevice();
                 }
             });
-            services.AddSingleton<ExtronCommunicator>(s => new ExtronCommunicator(s.GetRequiredService<ICommunicationDevice>(), true));
+            services.AddSingleton<ExtronCommunicator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

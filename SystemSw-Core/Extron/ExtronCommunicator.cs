@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace SystemSw_Core.Extron
         private CancellationTokenSource source;
         private Task readLoop;
         private readonly ICommunicationDevice com;
+        private readonly ILogger<ExtronCommunicator> logger;
 
 
         /// <summary>
@@ -86,13 +89,15 @@ namespace SystemSw_Core.Extron
         /// </summary>
         /// <param name="com">The device interface to communicate with</param>
         /// <param name="open">Immediately invoke <see cref="OpenConnection"/> if true</param>
-        public ExtronCommunicator(ICommunicationDevice com, bool open)
+        public ExtronCommunicator(
+            ICommunicationDevice com,
+            ILogger<ExtronCommunicator> logger,
+            IConfiguration configuration
+            )
         {
             this.com = com ?? throw new ArgumentNullException(nameof(com));
-            if (open)
-            {
-                OpenConnection();
-            }
+            this.logger = logger;
+            this.HandleAutoOpen(configuration);
         }
 
 
@@ -247,11 +252,12 @@ namespace SystemSw_Core.Extron
                 }
                 catch (TimeoutException)
                 {
-                    // no worries   
+                    // no worries  
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // something has gone horribly wrong [!]
+                    
                 }
             }
         }
@@ -260,6 +266,9 @@ namespace SystemSw_Core.Extron
         /// Handles the incoming response message
         /// </summary>
         /// <param name="response">The response string to interpret</param>
+        /// <remarks>
+        /// This is not an exact implementation of every response code that the Extron system can send back. Since I currently do not use all the features
+        /// </remarks>
         private void HandleIncomingResponse(string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
@@ -393,6 +402,7 @@ namespace SystemSw_Core.Extron
             com.Write(command);
         }
 
+
         private bool IsResponseError(string response)
         {
             return response[0] == 'E' || response[0] == 'e';
@@ -414,6 +424,18 @@ namespace SystemSw_Core.Extron
                     return "VLB switch enabled & last input selected";
             }
             return $"Unknown Error Code {errorCode}";
+        }
+
+        private void HandleAutoOpen(IConfiguration configuration)
+        {
+            var extronNode = configuration.GetSection("Extron");
+            if (extronNode is null) return;
+            var autoOpenFlag = extronNode["AutoOpen"];
+            if (autoOpenFlag is null) return;
+            if (bool.TryParse(autoOpenFlag, out var ao) && ao)
+            {
+                OpenConnection();
+            }
         }
 
     }
