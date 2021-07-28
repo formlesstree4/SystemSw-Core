@@ -47,6 +47,20 @@ Unless there's a particular need, don't adjust the 'AutoOpen' value either.
 The application supports named mappings via `appsettings.json` in the WebAPI project. Updating this project and reloading the page will show the changes in the mappings.
 This collection of mappings does not have a hard coded limit and you may add more than 10 entries. However, the Extron will be the one to dictate how many entries show up on the UI.
 
+Currently, the mappings are configured as such:
+```json
+  "ChannelMappings": {
+    "1": "Super Nintendo",
+    "2": "Wii",
+    "3": "Nintendo 64",
+    "4": "PS2 (JP)",
+    "5": "Famicom",
+    "7": "Sega Memecast",
+    "8": "Playstation 2 (EN)"
+  }
+```
+
+This will eventually be mapped internally to a Key-Value-Pair of <string, string>. The key is the switcher port on the Extron. The value is the name you want to show on the UI.
 
 # Building
 In order to build the application, NodeJS will need to be downloaded and installed on your local machine (and on the PATH environment variable)
