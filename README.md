@@ -60,7 +60,7 @@ Currently, the mappings are configured as such:
   }
 ```
 
-This will eventually be mapped internally to a Key-Value-Pair of <string, string>. The key is the switcher port on the Extron. The value is the name you want to show on the UI.
+This will eventually be mapped internally to a Key-Value-Pair of <string, string>. The key is the switcher port on the Extron. The value is the name you want to show on the UI. Any unmapped values will render as a question mark on the UI.
 
 # Building
 In order to build the application, NodeJS will need to be downloaded and installed on your local machine (and on the PATH environment variable)
