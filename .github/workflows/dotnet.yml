@@ -60,6 +60,7 @@ jobs:
         artifacts: "./release-api-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
         omitBody: 'true'
+        tag: 'latest'
         token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ui:
@@ -103,4 +104,5 @@ jobs:
       with:
         artifacts: "./release-ui-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
+        tag: 'latest'
         token: ${{ secrets.GITHUB_TOKEN }}
