@@ -103,7 +103,7 @@ jobs:
       with:
         type: 'zip'
         filename: './release-ui-${{ github.sha }}.zip'
-        path: './Release-Ui'
+        path: './Release-UI'
         
     - name: Upload UI
       uses: ncipollo/release-action@v1
