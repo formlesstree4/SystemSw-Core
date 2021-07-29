@@ -13,8 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       
-      - name: Setup Tagging
+      - name: Versioning
+        id: version
         uses: juliansangillo/tag-version@v1.5
 
   build_api:
