@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build_api:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-        
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
     - name: Restore dependencies
       run: dotnet restore
       
@@ -33,11 +36,7 @@ jobs:
     - name: Publish API
       if: success()
       run: dotnet publish -c Release -o .\Release-Api .\SystemSw-Api\SystemSw-Api.csproj
-      
-    - name: Publish UI
-      if: success()
-      run: dotnet publish -c Release -o .\Release-Ui .\SystemSw-Ui\SystemSw-Ui.csproj
-  
+
     - name: Zip API
       uses: thedoctor0/zip-release@master
       with:
@@ -45,18 +44,48 @@ jobs:
         filename: 'release-api.zip'
         path: '.\Release-Api'
         
+    - name: Upload API
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "release-api.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  build_ui:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup NPM
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      
+    - name: Publish UI
+      if: success()
+      run: dotnet publish -c Release -o .\Release-Ui .\SystemSw-Ui\SystemSw-Ui.csproj
+    
     - name: Zip UI
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: 'release-ui.zip'
         path: '.\Release-Ui'
-        
-    - name: Upload API
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "release-api.zip"
-        token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Upload UI
       uses: ncipollo/release-action@v1
