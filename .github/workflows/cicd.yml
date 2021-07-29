@@ -1,0 +1,116 @@
+name: Build And Setup Tag
+on:
+  push:
+    branches:
+      - develop
+      - test
+      - master
+
+jobs:
+  tag:
+    name: Create Release Tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: 'master'
+          pre_release_branches: 'develop,test'
+          append_to_pre_release_tag: '-pre'
+          
+      - name: Create a GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
+  build_api:
+    name: Build, test, and Publish API
+    runs-on: ubuntu-latest
+    
+    steps:    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Restore dependencies
+      run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
+      
+    - name: Build
+      run: dotnet build --no-restore ./SystemSw-Api/SystemSw-Api.csproj
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      
+    - name: Publish API
+      if: success()
+      run: dotnet publish -c Release -o ./Release-Api ./SystemSw-Api/SystemSw-Api.csproj
+
+    - name: Zip API
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: './release-api-${{ github.sha }}.zip'
+        path: './Release-Api'
+        
+    - name: Upload API
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./release-api-${{ github.sha }}.zip"
+        commit: ${{ github.sha }}
+        omitBody: 'true'
+        tag: ${{ steps.tag_version.outputs.new_tag }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  build_ui:
+    name: Build and Publish UI
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup NPM
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Restore dependencies
+      run: dotnet restore ./SystemSw-UI/SystemSw-UI.csproj
+      
+    - name: Build
+      run: dotnet build --no-restore ./SystemSw-UI/SystemSw-UI.csproj
+      
+    - name: Publish UI
+      if: success()
+      run: dotnet publish -c Release -o ./Release-UI ./SystemSw-UI/SystemSw-UI.csproj
+    
+    - name: Zip UI
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: './release-ui-${{ github.sha }}.zip'
+        path: './Release-UI'
+        
+    - name: Upload UI
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./release-ui-${{ github.sha }}.zip"
+        commit: ${{ github.sha }}
+        tag: ${{ steps.tag_version.outputs.new_tag }}
+        token: ${{ secrets.GITHUB_TOKEN }}
