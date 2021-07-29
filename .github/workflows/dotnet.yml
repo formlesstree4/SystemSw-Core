@@ -27,6 +27,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
+    - name: Help
+      run: ls -a
+      
     - name: Build
       run: dotnet build --no-restore .\SystemSw-Core\SystemSw-Api\SystemSw-Api.csproj
       
