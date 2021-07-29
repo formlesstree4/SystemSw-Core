@@ -2,6 +2,7 @@ name: Create Release
 
 on:  
   push:
+    branches: ['develop', 'test', 'master']
     tags:
       - '*'
 
