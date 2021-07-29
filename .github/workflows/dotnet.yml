@@ -42,14 +42,15 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: './release-api.zip'
+        filename: './release-api-${{ github.sha }}.zip'
         path: './Release-Api'
         
     - name: Upload API
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./release-api.zip"
+        artifacts: "./release-api-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
+        tag: ${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ui:
@@ -84,12 +85,13 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: './release-ui.zip'
+        filename: './release-ui-${{ github.sha }}.zip'
         path: './Release-Ui'
         
     - name: Upload UI
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./release-ui.zip"
+        artifacts: "./release-ui-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
+        tag: ${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
