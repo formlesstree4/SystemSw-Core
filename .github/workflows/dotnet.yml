@@ -12,17 +12,15 @@ jobs:
 
     steps:
     - name: Setup NPM
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+      uses: actions/setup-node@v2
       with:
-        node-version: '14'  
-    - run: npm install
-    - run: npm test
+        node-version: '14'
     
     - name: Setup .NET
-    - uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+        
     - name: Restore dependencies
       run: dotnet restore
       
@@ -41,21 +39,27 @@ jobs:
       run: dotnet publish -c Release -o .\Release-Ui .\SystemSw-Ui\SystemSw-Ui.csproj
   
     - name: Zip API
-    - uses: thedoctor0/zip-release@master
+      uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: 'release-api.zip'
         path: '.\Release-Api'
         
     - name: Zip UI
-    - uses: thedoctor0/zip-release@master
+      uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: 'release-ui.zip'
         path: '.\Release-Ui'
         
-    - name: Upload artifacts
-    - uses: actions/upload-artifact@v2
+    - name: Upload API
+      uses: ncipollo/release-action@v1
       with:
-        name: build-artifacts
-        path: '.\*.zip'
+        artifacts: "release-api.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload UI
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "release-ui.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
