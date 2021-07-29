@@ -25,27 +25,27 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
       
     - name: Help
       run: ls -a
       
     - name: Build
-      run: dotnet build --no-restore .\SystemSw-Core\SystemSw-Api\SystemSw-Api.csproj
+      run: dotnet build --no-restore ./SystemSw-Api/SystemSw-Api.csproj
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
       
     - name: Publish API
       if: success()
-      run: dotnet publish -c Release -o .\Release-Api .\SystemSw-Core\SystemSw-Api\SystemSw-Api.csproj
+      run: dotnet publish -c Release -o ./Release-Api ./SystemSw-Api/SystemSw-Api.csproj
 
     - name: Zip API
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: 'release-api.zip'
-        path: '.\Release-Api'
+        path: './Release-Api'
         
     - name: Upload API
       uses: ncipollo/release-action@v1
@@ -71,21 +71,21 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./SystemSw-Ui/SystemSw-Ui.csproj
       
     - name: Build
-      run: dotnet build --no-restore .\SystemSw-Core\SystemSw-Ui\SystemSw-Ui.csproj
+      run: dotnet build --no-restore ./SystemSw-Ui/SystemSw-Ui.csproj
       
     - name: Publish UI
       if: success()
-      run: dotnet publish -c Release -o .\Release-Ui .\SystemSw-Core\SystemSw-Api\SystemSw-Api.csproj
+      run: dotnet publish -c Release -o ./Release-Ui ./SystemSw-Ui/SystemSw-Ui.csproj
     
     - name: Zip UI
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
         filename: 'release-ui.zip'
-        path: '.\Release-Ui'
+        path: './Release-Ui'
         
     - name: Upload UI
       uses: ncipollo/release-action@v1
