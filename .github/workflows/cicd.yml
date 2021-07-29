@@ -42,6 +42,10 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
     
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
@@ -69,7 +73,7 @@ jobs:
         artifacts: "./release-api-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
         omitBody: 'true'
-        tag: ${{ steps.tag_version.outputs.new_tag }}
+        tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ui:
@@ -89,6 +93,10 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
     
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-UI/SystemSw-UI.csproj
@@ -112,5 +120,5 @@ jobs:
       with:
         artifacts: "./release-ui-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
-        tag: ${{ steps.tag_version.outputs.new_tag }}
+        tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
