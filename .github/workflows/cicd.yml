@@ -33,6 +33,7 @@ jobs:
   build_api:
     name: Build, test, and Publish API
     runs-on: ubuntu-latest
+    needs: [tag]
     
     steps:    
     - name: Setup .NET
@@ -79,6 +80,7 @@ jobs:
   build_ui:
     name: Build and Publish UI
     runs-on: ubuntu-latest
+    needs: [tag]
 
     steps:
     - name: Setup NPM
