@@ -18,7 +18,13 @@ jobs:
       
       - name: Versioning
         id: version
-        uses: juliansangillo/tag-version@v1.5
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          RELEASE_BRANCHES: 'master'
+          PRERELEASE_SUFFIX: 'pre-'
+          INITIAL_VERSION: '1.0.0'
 
   build_api:
     name: Build, test, and Publish API
