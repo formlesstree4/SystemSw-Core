@@ -7,16 +7,19 @@ on:
     branches: [ master ]
 
 jobs:
+  generate_build:
+    name: Generate Appropriate Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Tagging
+        uses: juliansangillo/tag-version@v1.5
+
   build_api:
     name: Build, test, and Publish API
     runs-on: ubuntu-latest
-
-    steps:
-    - name: Setup NPM
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+    needs: [generate_build]
     
+    steps:    
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -50,12 +53,13 @@ jobs:
       with:
         artifacts: "./release-api-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
-        tag: ${{ github.sha }}
+        omitBody: 'true'
         token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ui:
     name: Build and Publish UI
     runs-on: ubuntu-latest
+    needs: [generate_build]
 
     steps:
     - name: Setup NPM
@@ -93,5 +97,4 @@ jobs:
       with:
         artifacts: "./release-ui-${{ github.sha }}.zip"
         commit: ${{ github.sha }}
-        tag: ${{ github.sha }}
         token: ${{ secrets.GITHUB_TOKEN }}
