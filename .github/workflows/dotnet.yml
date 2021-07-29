@@ -11,6 +11,9 @@ jobs:
     name: Generate Appropriate Tag
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
       - name: Setup Tagging
         uses: juliansangillo/tag-version@v1.5
 
