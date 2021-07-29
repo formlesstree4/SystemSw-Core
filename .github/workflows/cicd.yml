@@ -46,8 +46,8 @@ jobs:
       
     - name: 'Get Previous tag'
       id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
-    
+      uses: actions-ecosystem/action-get-latest-tag@v1
+          
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
       
@@ -98,7 +98,7 @@ jobs:
       
     - name: 'Get Previous tag'
       id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      uses: actions-ecosystem/action-get-latest-tag@v1
     
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-UI/SystemSw-UI.csproj
