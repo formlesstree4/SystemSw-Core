@@ -68,7 +68,6 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "./release-api-${{ github.sha }}.zip"
-        commit: ${{ github.sha }}
         omitBody: 'true'
         tag: ${{ steps.tag_version.outputs.new_tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -113,6 +112,6 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "./release-ui-${{ github.sha }}.zip"
-        commit: ${{ github.sha }}
+        omitBody: 'true'
         tag: ${{ steps.tag_version.outputs.new_tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
