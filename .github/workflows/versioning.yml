@@ -2,9 +2,7 @@ name: Automatic Tag Creation
 
 on:
   push:
-    branches: [ develop, test ]
-  pull_request:
-    branches: [ master ]
+    branches: [ develop, test, master ]
 
 jobs:
   generate_build:
