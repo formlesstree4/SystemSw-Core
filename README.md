@@ -1,6 +1,13 @@
 # SystemSW-Sharp
 A mostly complete open source implementation of the Extron System 8/10 API in the C# programming language
 
+# Build Status
+
+[![Development](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml/badge.svg?branch=develop)](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml)
+
+[![Test](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml/badge.svg?branch=test)](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml)
+
+[![master](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml/badge.svg?branch=master)](https://github.com/formlesstree4/SystemSw-Core/actions/workflows/cicd.yml)
 
 # Features
 As I am not concerning myself with ALL the features of the Extron System 8/10 series, here's a rough idea of the feature set that is currently implemented inside SystemSW-Sharp:
