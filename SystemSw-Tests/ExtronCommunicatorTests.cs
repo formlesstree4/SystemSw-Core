@@ -84,6 +84,20 @@ namespace SystemSw_Tests
         }
 
 
+        [Fact(DisplayName = "Invoke the errorHandler callback when a valid error code is received")]
+        public async Task Fact_WhenAnErrorIsReturnedTheCallbackIsInvoked()
+        {
+            var errorString = "";
+            Action<string> callback = (error) => { errorString = error; };
+            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
+            ec.RegisterErrorCallback(callback);
+
+            // fake doesn't support projector power
+            ec.SetProjectorPower(true);
+            await Task.Delay(150);
+            Assert.True(!string.IsNullOrWhiteSpace(errorString));
+        }
+
 
         private static IConfiguration GetConfiguration(bool autoload)
         {

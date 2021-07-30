@@ -19,7 +19,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: 'master'
           pre_release_branches: 'develop,test'
-          append_to_pre_release_tag: '-pre'
           
       - name: Create a GitHub release
         uses: actions/create-release@v1
@@ -33,6 +32,7 @@ jobs:
   build_api:
     name: Build, test, and Publish API
     runs-on: ubuntu-latest
+    needs: [tag]
     
     steps:    
     - name: Setup .NET
@@ -42,7 +42,11 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
-    
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+          
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
       
@@ -67,14 +71,16 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "./release-api-${{ github.sha }}.zip"
+        allowUpdates: 'true'
         commit: ${{ github.sha }}
         omitBody: 'true'
-        tag: ${{ steps.tag_version.outputs.new_tag }}
+        tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
   build_ui:
     name: Build and Publish UI
     runs-on: ubuntu-latest
+    needs: [tag]
 
     steps:
     - name: Setup NPM
@@ -89,6 +95,10 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: actions-ecosystem/action-get-latest-tag@v1
     
     - name: Restore dependencies
       run: dotnet restore ./SystemSw-UI/SystemSw-UI.csproj
@@ -111,6 +121,7 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "./release-ui-${{ github.sha }}.zip"
+        allowUpdates: 'true'
         commit: ${{ github.sha }}
-        tag: ${{ steps.tag_version.outputs.new_tag }}
+        tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}

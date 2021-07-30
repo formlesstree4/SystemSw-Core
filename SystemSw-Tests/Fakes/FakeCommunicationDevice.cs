@@ -79,20 +79,27 @@ namespace SystemSw_Tests.Fakes
                 case ']':
                 case '(':
                 case ')':
+                    response = "E04";
                     break;
             }
             if (text.Length <= 1) return;
 
+            var channel = text[0..^1];
+            if (int.TryParse(channel, out var cn) && cn > max)
+            {
+                response = "E01";
+                return;
+            }
             switch (text.Last())
             {
                 case '!':
-                    response = $"C{text[0..^1]}";
+                    response = $"C{channel}";
                     break;
                 case '&':
-                    response = $"V{text[0..^1]}";
+                    response = $"V{channel}";
                     break;
                 case '$':
-                    response = $"A{text[0..^1]}";
+                    response = $"A{channel}";
                     break;
             }
         }
