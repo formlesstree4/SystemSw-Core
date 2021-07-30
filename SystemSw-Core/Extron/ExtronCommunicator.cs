@@ -22,6 +22,7 @@ namespace SystemSw_Core.Extron
         private Task readLoop;
         private readonly ICommunicationDevice com;
         private readonly ILogger<ExtronCommunicator> logger;
+        private Action<string> errorHandler;
 
 
         /// <summary>
@@ -197,8 +198,6 @@ namespace SystemSw_Core.Extron
             Write("q");
         }
 
-
-
         /// <summary>
         /// Sets the projector power if it is connected
         /// </summary>
@@ -241,6 +240,22 @@ namespace SystemSw_Core.Extron
         }
 
         /// <summary>
+        /// Registers a handler to process when an error code is raised. Multiple handlers can be registered as a callback
+        /// </summary>
+        /// <param name="errorHandler">The error handler that will take the error message</param>
+        public void RegisterErrorCallback(Action<string> errorHandler)
+        {
+            if (this.errorHandler is null)
+            {
+                this.errorHandler = errorHandler;
+            }
+            else
+            {
+                this.errorHandler += errorHandler;
+            }
+        }
+
+        /// <summary>
         /// Polls the serial port for incoming data
         /// </summary>
         private void InternalReadLoop()
@@ -277,6 +292,20 @@ namespace SystemSw_Core.Extron
         private void HandleIncomingResponse(string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
+            if (IsResponseError(response))
+            {
+                // raise the error
+                try
+                {
+                    logger.LogWarning($"Error Code {response} was received");
+                    errorHandler(GetErrorMessage(response));                    
+                }
+                catch (System.Exception ex)
+                {
+                    logger.LogError(ex, "There was an issue passing the error code out to the error handler");
+                }
+                return;
+            }
 
             // let's handle all the permutations I care about
             switch (response[0])
