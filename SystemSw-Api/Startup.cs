@@ -4,9 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SystemSw_Api.Models;
-using SystemSw_Core.Extron;
-using SystemSw_Core.Extron.Devices;
+using System8.Communicator;
+using SystemCommunicator.Devices;
 
 namespace SystemSw_Api
 {
@@ -27,20 +26,7 @@ namespace SystemSw_Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SystemSW WebAPI", Version = "v1" });
             });
-            services.AddSingleton<ICommunicationDevice>((provider) => 
-            {
-                var config = provider.GetRequiredService<IConfiguration>();
-                var extronCfg = new ExtronConfiguration();
-                config.GetSection("Extron").Bind(extronCfg);
-                if (extronCfg.Type.Equals("serial", System.StringComparison.OrdinalIgnoreCase))
-                {
-                    return new SerialCommunicationDevice(extronCfg.Port, false, extronCfg.ReadTimeout);
-                }
-                else
-                {
-                    return new TestCommDevice();
-                }
-            });
+            services.AddSingleton<ICommunicationDevice, SerialCommunicationDevice>();
             services.AddSingleton<ExtronCommunicator>();
         }
 

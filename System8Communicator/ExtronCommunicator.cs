@@ -4,9 +4,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SystemSw_Core.Extron.Devices;
 
-namespace SystemSw_Core.Extron
+using SystemCommunicator.Devices;
+
+namespace System8.Communicator
 {
 
     /// <summary>
@@ -213,7 +214,7 @@ namespace SystemSw_Core.Extron
         /// <param name="visible">true to set visibility to on</param>
         public void SetProjectorVisibility(bool visible)
         {
-            Write(visible ? ")": "(");
+            Write(visible ? ")" : "(");
         }
 
         /// <summary>
@@ -260,7 +261,7 @@ namespace SystemSw_Core.Extron
         /// </summary>
         private void InternalReadLoop()
         {
-            while(!source.IsCancellationRequested)
+            while (!source.IsCancellationRequested)
             {
                 try
                 {
@@ -298,7 +299,7 @@ namespace SystemSw_Core.Extron
                 try
                 {
                     logger.LogWarning($"Error Code {response} was received");
-                    errorHandler(GetErrorMessage(response));                    
+                    errorHandler(GetErrorMessage(response));
                 }
                 catch (System.Exception ex)
                 {

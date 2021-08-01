@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>SystemSw_Tests</RootNamespace>
+    <RootNamespace>SystemSw.Sharp.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
 
@@ -39,7 +39,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SystemSw-Core\SystemSw-Core.csproj" />
+    <ProjectReference Include="..\System8Communicator\System8.Communicator.csproj" />
+    <ProjectReference Include="..\SystemCommunicator\SystemCommunicator.csproj" />
   </ItemGroup>
 
 </Project>

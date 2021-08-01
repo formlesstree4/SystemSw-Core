@@ -48,17 +48,17 @@ jobs:
       uses: actions-ecosystem/action-get-latest-tag@v1
           
     - name: Restore dependencies
-      run: dotnet restore ./SystemSw-Api/SystemSw-Api.csproj
+      run: dotnet restore ./SystemSw-Api/System8.Api.csproj
       
     - name: Build
-      run: dotnet build --no-restore ./SystemSw-Api/SystemSw-Api.csproj
+      run: dotnet build --no-restore ./SystemSw-Api/System8.Api.csproj
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
       
     - name: Publish API
       if: success()
-      run: dotnet publish -c Release -o ./Release-Api ./SystemSw-Api/SystemSw-Api.csproj
+      run: dotnet publish -c Release -o ./Release-Api ./SystemSw-Api/System8.Api.csproj
 
     - name: Zip API
       uses: thedoctor0/zip-release@master
@@ -101,14 +101,14 @@ jobs:
       uses: actions-ecosystem/action-get-latest-tag@v1
     
     - name: Restore dependencies
-      run: dotnet restore ./SystemSw-UI/SystemSw-UI.csproj
+      run: dotnet restore ./SystemSw-UI/System8.Ui.csproj
       
     - name: Build
-      run: dotnet build --no-restore ./SystemSw-UI/SystemSw-UI.csproj
+      run: dotnet build --no-restore ./SystemSw-UI/System8.Ui.csproj
       
     - name: Publish UI
       if: success()
-      run: dotnet publish -c Release -o ./Release-UI ./SystemSw-UI/SystemSw-UI.csproj
+      run: dotnet publish -c Release -o ./Release-UI ./SystemSw-UI/System8.Ui.csproj
     
     - name: Zip UI
       uses: thedoctor0/zip-release@master

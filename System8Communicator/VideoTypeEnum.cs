@@ -1,4 +1,4 @@
-﻿namespace SystemSw_Core.Extron
+﻿namespace System8.Communicator
 {
 
     /// <summary>

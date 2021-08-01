@@ -1,31 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using SystemSw_Core.Extron.Devices;
+﻿using SystemCommunicator.Devices;
 
-namespace SystemSw_Tests.Fakes
+namespace SystemSw.Sharp.Tests.System8.Fakes
 {
-    public sealed class FakeCommunicationDevice : ICommunicationDevice
+    public sealed class DummyCommunicationDevice : ICommunicationDevice
     {
+        private const string Identify = "V1 A1 T1 P0 S0 Z0 R0 QSC1.11 QPC1.11 M4";
 
-        private const string qsc = "1.99";
-        private const string qpc = "1.99";
+        private const string qsc = "1.11";
+        private const string qpc = "1.11";
         private const int max = 4;
-        private readonly string Identify = $"V1 A1 T1 P0 S0 Z0 R0 QSC{qsc} QPC{qpc} M{max}";
 
         private string response = "";
         private bool isDisposed = false;
 
         public bool IsOpen { get; private set; }
 
-
-        public FakeCommunicationDevice(string verify = null)
-        {
-            Identify = verify ?? Identify;
-        }
 
         public void Close()
         {
@@ -44,7 +33,6 @@ namespace SystemSw_Tests.Fakes
         public string ReadLine()
         {
             AssertDisposed();
-            SpinWait.SpinUntil(() => !string.IsNullOrEmpty(response), Timeout.Infinite);
             var r = response;
             response = "";
             return r;
@@ -79,27 +67,20 @@ namespace SystemSw_Tests.Fakes
                 case ']':
                 case '(':
                 case ')':
-                    response = "E04";
                     break;
             }
             if (text.Length <= 1) return;
 
-            var channel = text[0..^1];
-            if (int.TryParse(channel, out var cn) && cn > max)
-            {
-                response = "E01";
-                return;
-            }
-            switch (text.Last())
+            switch (text[1])
             {
                 case '!':
-                    response = $"C{channel}";
+                    response = $"C{text[0]}";
                     break;
                 case '&':
-                    response = $"V{channel}";
+                    response = $"V{text[0]}";
                     break;
                 case '$':
-                    response = $"A{channel}";
+                    response = $"A{text[0]}";
                     break;
             }
         }
@@ -107,8 +88,7 @@ namespace SystemSw_Tests.Fakes
 
         private void AssertDisposed()
         {
-            if (isDisposed) throw new System.ObjectDisposedException($"{nameof(TestCommDevice)}");
+            if (isDisposed) throw new System.ObjectDisposedException($"{nameof(DummyCommunicationDevice)}");
         }
-
     }
 }

@@ -10,7 +10,7 @@
 
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
-    <RootNamespace>SystemSw_UI</RootNamespace>
+    <RootNamespace>SystemSw.System8.Ui</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

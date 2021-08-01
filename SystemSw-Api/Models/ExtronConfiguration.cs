@@ -1,4 +1,4 @@
-namespace SystemSw_Api.Models
+namespace System8.Api.Models
 {
     public class ExtronConfiguration
     {

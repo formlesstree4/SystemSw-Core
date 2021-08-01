@@ -1,15 +1,12 @@
-using Moq;
-using System;
-using Xunit;
-
-using SystemSw_Core.Extron.Devices;
-using SystemSw_Core.Extron;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using System;
+using System.Threading.Tasks;
+using System8.Communicator;
+using Xunit;
 
-namespace SystemSw_Tests
+namespace SystemSw.Sharp.Tests.System8
 {
     public class ExtronCommunicatorTests
     {
