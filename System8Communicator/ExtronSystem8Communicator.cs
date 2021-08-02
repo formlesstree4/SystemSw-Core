@@ -4,7 +4,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using SystemCommunicator.Communication;
+using SystemCommunicator.Communication.Results;
 using SystemCommunicator.Devices;
 
 namespace System8.Communicator
@@ -17,12 +18,12 @@ namespace System8.Communicator
     /// The code written here was based off the RS-232 programming guide located on pages A-3, A-4, and A-5.
     /// I will not be providing a copy of the manual as it can be found on Extron's website.
     /// </remarks>
-    public sealed class ExtronCommunicator : IDisposable
+    public sealed class ExtronSystem8Communicator : IExtronDeviceCommunicator, IDisposable
     {
         private CancellationTokenSource source;
         private Task readLoop;
         private readonly ICommunicationDevice com;
-        private readonly ILogger<ExtronCommunicator> logger;
+        private readonly ILogger<ExtronSystem8Communicator> logger;
         private Action<string> errorHandler;
 
 
@@ -89,16 +90,20 @@ namespace System8.Communicator
         /// </summary>
         public bool IsConnectionOpen => com.IsOpen;
 
+        public string FirmwareVersion => SwitcherFirmwareVersion;
+
+        public ICommunicationDevice CommunicationDevice => com;
+
 
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ExtronCommunicator"/> for the given serial port
+        /// Creates a new instance of the <see cref="ExtronSystem8Communicator"/> for the given serial port
         /// </summary>
         /// <param name="com">The device interface to communicate with</param>
         /// <param name="open">Immediately invoke <see cref="OpenConnection"/> if true</param>
-        public ExtronCommunicator(
+        public ExtronSystem8Communicator(
             ICommunicationDevice com,
-            ILogger<ExtronCommunicator> logger,
+            ILogger<ExtronSystem8Communicator> logger,
             IConfiguration configuration
             )
         {
@@ -118,32 +123,41 @@ namespace System8.Communicator
         /// <exception cref="System.ArgumentException"/>
         /// <exception cref="System.InvalidOperationException"/>
         /// <exception cref="System.IO.IOException"/>
-        public void OpenConnection(bool doNotIdentify = false)
+        public ICommunicationResult OpenConnection(bool doNotIdentify = false)
         {
-            if (com.IsOpen) return;
+            if (com.IsOpen) return CommunicationResult.Error("connection already open", ResultCode.Unknown, false);
             com.Open();
             source = new CancellationTokenSource();
             readLoop = Task.Run(InternalReadLoop);
             if (!doNotIdentify) Identify();
+            return CommunicationResult.Ok();
         }
+
+        /// <summary>
+        /// Attempts to open the connection to the Extron device
+        /// </summary>
+        /// <returns><see cref="ICommunicationResult"/></returns>
+        public ICommunicationResult OpenConnection() => OpenConnection(false);
 
         /// <summary>
         /// Attempts to close the connection
         /// </summary>
-        public void CloseConnection()
+        public ICommunicationResult CloseConnection()
         {
             com.Close();
             source.Cancel();
             readLoop.Dispose();
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Identifies what the connected system is and sets up initial settings.
         /// </summary>
         /// <returns>A promise to indicate if identification was successful</returns>
-        public void Identify()
+        public ICommunicationResult Identify()
         {
             Write(command: "I");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>

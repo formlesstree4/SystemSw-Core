@@ -11,12 +11,12 @@ namespace SystemSw.Sharp.Tests.System8
     public class ExtronCommunicatorTests
     {
 
-        private readonly ILogger<ExtronCommunicator> logger;
+        private readonly ILogger<ExtronSystem8Communicator> logger;
 
 
         public ExtronCommunicatorTests()
         {
-            logger = new NullLogger<ExtronCommunicator>();
+            logger = new NullLogger<ExtronSystem8Communicator>();
         }
 
 
@@ -24,7 +24,7 @@ namespace SystemSw.Sharp.Tests.System8
         [InlineData(true), InlineData(false)]
         public void Test_OpenWhenFlagIsSetToTrue(bool shouldBeOpen)
         {
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(shouldBeOpen));
+            var ec = new ExtronSystem8Communicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(shouldBeOpen));
             Assert.Equal(shouldBeOpen, ec.IsConnectionOpen);
         }
 
@@ -39,7 +39,7 @@ namespace SystemSw.Sharp.Tests.System8
             var qpcVersion = rnd.Next(10, 99);
             var identifyString = $"V{vidChannel} A{audChannel} T1 P0 S0 Z0 R0 QSC1.{qscVersion} QPC1.{qpcVersion} M{channelCount}";
             var icd = new Fakes.FakeCommunicationDevice(identifyString);
-            var ec = new ExtronCommunicator(icd, logger, GetConfiguration(false));
+            var ec = new ExtronSystem8Communicator(icd, logger, GetConfiguration(false));
             
             ec.OpenConnection(true);
             ec.Identify();
@@ -57,7 +57,7 @@ namespace SystemSw.Sharp.Tests.System8
         [InlineData(2, 2), InlineData(2, 3), InlineData(3, 2)]
         public async Task Theory_HandleSimpleChannelSwitching(int audioChannel, int videoChannel)
         {
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
+            var ec = new ExtronSystem8Communicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
             await Task.Delay(150);
             ec.ChangeAudioChannel(audioChannel);
             await Task.Delay(150);
@@ -71,7 +71,7 @@ namespace SystemSw.Sharp.Tests.System8
         [InlineData(1), InlineData(3)]
         public async Task Theory_HandleSwitchingAudioAndVideo(int channel)
         {
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
+            var ec = new ExtronSystem8Communicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
             await Task.Delay(150);
             ec.ChangeChannel(channel);
             await Task.Delay(150);
@@ -86,7 +86,7 @@ namespace SystemSw.Sharp.Tests.System8
         {
             var errorString = "";
             Action<string> callback = (error) => { errorString = error; };
-            var ec = new ExtronCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
+            var ec = new ExtronSystem8Communicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(true));
             ec.RegisterErrorCallback(callback);
 
             // fake doesn't support projector power

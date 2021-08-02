@@ -16,13 +16,13 @@ namespace System8.Api.Controllers
     {
         
         private readonly ILogger<SwitcherController> logger;
-        private readonly ExtronCommunicator ec;
+        private readonly ExtronSystem8Communicator ec;
         private readonly Dictionary<string, string> mappings;
 
         public SwitcherController(
             IConfiguration configuration,
             ILogger<SwitcherController> logger,
-            ExtronCommunicator ec)
+            ExtronSystem8Communicator ec)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.ec = ec ?? throw new ArgumentNullException(nameof(ec));

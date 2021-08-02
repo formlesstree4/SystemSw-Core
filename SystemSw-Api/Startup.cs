@@ -27,7 +27,7 @@ namespace SystemSw_Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SystemSW WebAPI", Version = "v1" });
             });
             services.AddSingleton<ICommunicationDevice, SerialCommunicationDevice>();
-            services.AddSingleton<ExtronCommunicator>();
+            services.AddSingleton<ExtronSystem8Communicator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
