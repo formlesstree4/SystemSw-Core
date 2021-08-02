@@ -165,14 +165,15 @@ namespace System8.Communicator
         /// </summary>
         /// <param name="channel">The channel to change to</param>
         /// <returns>A promise to indicate if it was successful or not</returns>
-        public void ChangeChannel(int channel)
+        public ICommunicationResult ChangeChannel(int channel)
         {
             if (channel < 0 || channel > Channels)
             {
-                return;
+                return CommunicationResult.Error("out of range", ResultCode.Error, false);
             }
 
             Write($"{channel}!");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
@@ -180,14 +181,15 @@ namespace System8.Communicator
         /// </summary>
         /// <param name="channel">The channel to change to</param>
         /// <returns>A promise to indicate if it was successful or not</returns>
-        public void ChangeVideoChannel(int channel)
+        public ICommunicationResult ChangeVideoChannel(int channel)
         {
             if (channel < 0 || channel > Channels)
             {
-                return;
+                return CommunicationResult.Error("out of range", ResultCode.Error, false);
             }
 
             Write($"{channel}&");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
@@ -195,58 +197,64 @@ namespace System8.Communicator
         /// </summary>
         /// <param name="channel">The channel to change to</param>
         /// <returns>A promise to indicate if it was successful or not</returns>
-        public void ChangeAudioChannel(int channel)
+        public ICommunicationResult ChangeAudioChannel(int channel)
         {
             if (channel < 0 || channel > Channels)
             {
-                return;
+                return CommunicationResult.Error("out of range", ResultCode.Error, false);
             }
 
             Write($"{channel}$");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Updates the software version numbers for the Extron
         /// </summary>
-        public void GetSoftwareVersions()
+        public ICommunicationResult GetSoftwareVersions()
         {
             Write("q");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Sets the projector power if it is connected
         /// </summary>
         /// <param name="powered">true to set power on</param>
-        public void SetProjectorPower(bool powered)
+        public ICommunicationResult SetProjectorPower(bool powered)
         {
             Write(powered ? "[" : "]");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Sets the projector visibility if it is connected
         /// </summary>
         /// <param name="visible">true to set visibility to on</param>
-        public void SetProjectorVisibility(bool visible)
+        public ICommunicationResult SetProjectorVisibility(bool visible)
         {
             Write(visible ? ")" : "(");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Set the RGB visibility state
         /// </summary>
         /// <param name="visible">true to set visibility to on</param>
-        public void SetRgbVisibility(bool visible)
+        public ICommunicationResult SetRgbVisibility(bool visible)
         {
             Write(visible ? "b" : "B");
+            return CommunicationResult.Ok();
         }
 
         /// <summary>
         /// Sets whether or not the audio line is muted or not
         /// </summary>
         /// <param name="muted">true to mute</param>
-        public void SetAudioState(bool muted)
+        public ICommunicationResult SetAudioState(bool muted)
         {
             Write(muted ? "+" : "-");
+            return CommunicationResult.Ok();
         }
 
         public void Dispose()
