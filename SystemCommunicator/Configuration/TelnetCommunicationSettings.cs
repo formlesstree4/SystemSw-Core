@@ -20,6 +20,16 @@ namespace SystemCommunicator.Configuration
         public int Port { get; set; }
 
         /// <summary>
+        /// Gets or sets the Username used to login to the telnet device
+        /// </summary>
+        public string Username { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Password used to login to the telnet device
+        /// </summary>
+        public string Password { get; set; }
+
+        /// <summary>
         /// Gets the remote connection as an instance of <see cref="IPEndPoint"/>
         /// </summary>
         /// <remarks>

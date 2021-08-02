@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -49,6 +50,7 @@ namespace SystemCommunicator.Devices
         {
             logger.LogTrace("Closing Connection");
             telnetClient.Close();
+            IsOpen = false;
         }
 
         public void Dispose()
@@ -61,13 +63,24 @@ namespace SystemCommunicator.Devices
         {
             logger.LogTrace("Opening Connection");
             telnetClient.Connect(endpoint);
+            IsOpen = true;
         }
 
         public string ReadLine()
         {
             logger.LogTrace("ReadLine()");
-            using var sr = new StreamReader(telnetClient.GetStream(), leaveOpen: true);
-            return sr.ReadLine();
+            try
+            {
+                using var sr = new StreamReader(telnetClient.GetStream(), leaveOpen: true);
+                return sr.ReadLine();
+            }
+            catch (InvalidOperationException ioe)
+            {
+                // we actually might be hosed here! The connection has been lost
+                logger.LogError(ioe, "the connection with the remote server has been lost");
+                Close();
+                return "";
+            }
         }
 
         public void Write(string text)
