@@ -460,12 +460,12 @@ namespace System8.Communicator
         }
 
 
-        private bool IsResponseError(string response)
+        private static bool IsResponseError(string response)
         {
             return response[0] == 'E' || response[0] == 'e';
         }
 
-        private string GetErrorMessage(string errorCode)
+        private static string GetErrorMessage(string errorCode)
         {
             switch (errorCode.ToUpper())
             {
