@@ -479,7 +479,9 @@ namespace System8.Communicator
         {
             var extronNode = configuration.GetSection("Extron");
             if (extronNode is null) return;
-            var autoOpenFlag = extronNode["AutoOpen"];
+            var serialNode = extronNode.GetSection("Serial");
+            if (serialNode is null) return;
+            var autoOpenFlag = serialNode["AutoOpen"];
             if (autoOpenFlag is null) return;
             if (bool.TryParse(autoOpenFlag, out var ao) && ao)
             {
