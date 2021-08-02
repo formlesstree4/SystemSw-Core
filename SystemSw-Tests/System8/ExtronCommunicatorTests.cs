@@ -41,7 +41,7 @@ namespace SystemSw.Sharp.Tests.System8
             var icd = new Fakes.FakeCommunicationDevice(identifyString);
             var ec = new ExtronSystem8Communicator(icd, logger, GetConfiguration(false));
             
-            ec.OpenConnection(true);
+            ec.OpenConnection();
             ec.Identify();
 
             await Task.Delay(100);

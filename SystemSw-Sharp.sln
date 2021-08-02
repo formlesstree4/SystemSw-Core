@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommunicator", "Syste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System8.Communicator", "System8Communicator\System8.Communicator.csproj", "{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crosspoint.Communicator", "Crosspoint.Communicator\Crosspoint.Communicator.csproj", "{795C30F0-74F2-4547-9046-F5D39EA69345}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}.Release|Any CPU.Build.0 = Release|Any CPU
+		{795C30F0-74F2-4547-9046-F5D39EA69345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795C30F0-74F2-4547-9046-F5D39EA69345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795C30F0-74F2-4547-9046-F5D39EA69345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795C30F0-74F2-4547-9046-F5D39EA69345}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +60,7 @@ Global
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676} = {6C6E12C5-1DD1-404C-B8AB-E9533B93AE8E}
 		{108C1D47-73B0-4F99-B69B-224F582469B5} = {2DEF517E-6C18-4D83-82D8-B6DBE565784A}
 		{D75D9CBE-CBF1-45DB-9DFC-2C150304F730} = {6C6E12C5-1DD1-404C-B8AB-E9533B93AE8E}
+		{795C30F0-74F2-4547-9046-F5D39EA69345} = {94F36A20-03C3-402C-8B59-FC1F5B653C12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40758A8F-C4A8-44D4-9D1D-F33C14F638E7}

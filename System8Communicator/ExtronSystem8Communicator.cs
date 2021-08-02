@@ -18,14 +18,8 @@ namespace System8.Communicator
     /// The code written here was based off the RS-232 programming guide located on pages A-3, A-4, and A-5.
     /// I will not be providing a copy of the manual as it can be found on Extron's website.
     /// </remarks>
-    public sealed class ExtronSystem8Communicator : IExtronDeviceCommunicator, IDisposable
+    public sealed class ExtronSystem8Communicator : ExtronDeviceCommunicatorBase<ExtronSystem8Communicator>, IDisposable
     {
-        private CancellationTokenSource source;
-        private Task readLoop;
-        private readonly ICommunicationDevice com;
-        private readonly ILogger<ExtronSystem8Communicator> logger;
-        private Action<string> errorHandler;
-
 
         /// <summary>
         /// Gets the number of channels that the connected system supports
@@ -85,80 +79,23 @@ namespace System8.Communicator
         /// </summary>
         public string ProjectorFirmwareVersion { get; private set; }
 
-        /// <summary>
-        /// Gets whether or not the current connection is open
-        /// </summary>
-        public bool IsConnectionOpen => com.IsOpen;
-
-        public string FirmwareVersion => SwitcherFirmwareVersion;
-
-        public ICommunicationDevice CommunicationDevice => com;
-
 
 
         /// <summary>
         /// Creates a new instance of the <see cref="ExtronSystem8Communicator"/> for the given serial port
         /// </summary>
         /// <param name="com">The device interface to communicate with</param>
-        /// <param name="open">Immediately invoke <see cref="OpenConnection"/> if true</param>
+        /// <param name="logger">Logging class</param>
+        /// <param name="configuration">The configuration class</param>
         public ExtronSystem8Communicator(
             ICommunicationDevice com,
             ILogger<ExtronSystem8Communicator> logger,
-            IConfiguration configuration
-            )
+            IConfiguration configuration) : base(com, logger, configuration)
         {
-            this.com = com ?? throw new ArgumentNullException(nameof(com));
-            this.logger = logger;
             this.HandleAutoOpen(configuration);
         }
 
 
-
-        /// <summary>
-        /// Attempts to open the connection
-        /// </summary>
-        /// <param name="doNotIdentify">If set to true, will not run Identify</param>
-        /// <exception cref="System.UnauthorizedAccessException"/>
-        /// <exception cref="System.ArgumentOutOfRangeException"/>
-        /// <exception cref="System.ArgumentException"/>
-        /// <exception cref="System.InvalidOperationException"/>
-        /// <exception cref="System.IO.IOException"/>
-        public ICommunicationResult OpenConnection(bool doNotIdentify = false)
-        {
-            if (com.IsOpen) return CommunicationResult.Error("connection already open", ResultCode.Unknown, false);
-            com.Open();
-            source = new CancellationTokenSource();
-            readLoop = Task.Run(InternalReadLoop);
-            if (!doNotIdentify) Identify();
-            return CommunicationResult.Ok();
-        }
-
-        /// <summary>
-        /// Attempts to open the connection to the Extron device
-        /// </summary>
-        /// <returns><see cref="ICommunicationResult"/></returns>
-        public ICommunicationResult OpenConnection() => OpenConnection(false);
-
-        /// <summary>
-        /// Attempts to close the connection
-        /// </summary>
-        public ICommunicationResult CloseConnection()
-        {
-            com.Close();
-            source.Cancel();
-            readLoop.Dispose();
-            return CommunicationResult.Ok();
-        }
-
-        /// <summary>
-        /// Identifies what the connected system is and sets up initial settings.
-        /// </summary>
-        /// <returns>A promise to indicate if identification was successful</returns>
-        public ICommunicationResult Identify()
-        {
-            Write(command: "I");
-            return CommunicationResult.Ok();
-        }
 
         /// <summary>
         /// Changes the audio and video channels
@@ -257,52 +194,10 @@ namespace System8.Communicator
             return CommunicationResult.Ok();
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            com.Dispose();
-        }
-
-        /// <summary>
-        /// Registers a handler to process when an error code is raised. Multiple handlers can be registered as a callback
-        /// </summary>
-        /// <param name="errorHandler">The error handler that will take the error message</param>
-        public void RegisterErrorCallback(Action<string> errorHandler)
-        {
-            if (this.errorHandler is null)
-            {
-                this.errorHandler = errorHandler;
-            }
-            else
-            {
-                this.errorHandler += errorHandler;
-            }
-        }
-
-        /// <summary>
-        /// Polls the serial port for incoming data
-        /// </summary>
-        private void InternalReadLoop()
-        {
-            while (!source.IsCancellationRequested)
-            {
-                try
-                {
-                    var dataLine = com.ReadLine();
-                    if (!string.IsNullOrEmpty(dataLine))
-                    {
-                        HandleIncomingResponse(dataLine);
-                    }
-                }
-                catch (TimeoutException)
-                {
-                    // no worries  
-                }
-                catch (Exception ex)
-                {
-                    // something has gone horribly wrong [!]
-                    logger.LogError(ex, "An error occurred reading from the stream");
-                }
-            }
+            CommunicationDevice.Dispose();
         }
 
         /// <summary>
@@ -312,7 +207,7 @@ namespace System8.Communicator
         /// <remarks>
         /// This is not an exact implementation of every response code that the Extron system can send back. Since I currently do not use all the features
         /// </remarks>
-        private void HandleIncomingResponse(string response)
+        protected override void HandleIncomingResponse(string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
             if (IsResponseError(response))
@@ -320,12 +215,12 @@ namespace System8.Communicator
                 // raise the error
                 try
                 {
-                    logger.LogWarning($"Error Code {response} was received");
-                    errorHandler(GetErrorMessage(response));
+                    Logger.LogWarning($"Error Code {response} was received");
+                    InvokeErrorHandler(GetErrorMessage(response));
                 }
                 catch (System.Exception ex)
                 {
-                    logger.LogError(ex, "There was an issue passing the error code out to the error handler");
+                    Logger.LogError(ex, "There was an issue passing the error code out to the error handler");
                 }
                 return;
             }
@@ -449,15 +344,21 @@ namespace System8.Communicator
             SwitcherFirmwareVersion = responseArray[7][3..];
             ProjectorFirmwareVersion = responseArray[8][3..];
         }
-
-        /// <summary>
-        /// Writes a command to the serial port
-        /// </summary>
-        /// <param name="command">The command to write</param>
-        private void Write(string command)
+        
+        private void HandleAutoOpen(IConfiguration configuration)
         {
-            com.Write(command);
+            var extronNode = configuration.GetSection("Extron");
+            if (extronNode is null) return;
+            var serialNode = extronNode.GetSection("Serial");
+            if (serialNode is null) return;
+            var autoOpenFlag = serialNode["AutoOpen"];
+            if (autoOpenFlag is null) return;
+            if (bool.TryParse(autoOpenFlag, out var ao) && ao)
+            {
+                OpenConnection();
+            }
         }
+
 
 
         private static bool IsResponseError(string response)
@@ -481,20 +382,6 @@ namespace System8.Communicator
                     return "VLB switch enabled & last input selected";
             }
             return $"Unknown Error Code {errorCode}";
-        }
-
-        private void HandleAutoOpen(IConfiguration configuration)
-        {
-            var extronNode = configuration.GetSection("Extron");
-            if (extronNode is null) return;
-            var serialNode = extronNode.GetSection("Serial");
-            if (serialNode is null) return;
-            var autoOpenFlag = serialNode["AutoOpen"];
-            if (autoOpenFlag is null) return;
-            if (bool.TryParse(autoOpenFlag, out var ao) && ao)
-            {
-                OpenConnection();
-            }
         }
 
     }

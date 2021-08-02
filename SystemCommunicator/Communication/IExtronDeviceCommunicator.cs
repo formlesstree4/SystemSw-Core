@@ -1,4 +1,5 @@
-﻿using SystemCommunicator.Devices;
+﻿using System;
+using SystemCommunicator.Devices;
 
 namespace SystemCommunicator.Communication
 {
@@ -50,6 +51,12 @@ namespace SystemCommunicator.Communication
         /// </summary>
         /// <returns><see cref="ICommunicationResult"/></returns>
         ICommunicationResult Identify();
+
+        /// <summary>
+        /// Registers a callback for invoking when an error arises that needs to be responded to
+        /// </summary>
+        /// <param name="errorHandler">The callback</param>
+        void RegisterErrorCallback(Action<string> errorHandler);
 
     }
 
