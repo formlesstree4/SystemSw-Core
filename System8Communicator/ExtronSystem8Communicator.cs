@@ -200,14 +200,8 @@ namespace System8.Communicator
             CommunicationDevice.Dispose();
         }
 
-        /// <summary>
-        /// Handles the incoming response message
-        /// </summary>
-        /// <param name="response">The response string to interpret</param>
-        /// <remarks>
-        /// This is not an exact implementation of every response code that the Extron system can send back. Since I currently do not use all the features
-        /// </remarks>
-        protected override void HandleIncomingResponse(string response)
+        /// <inheritdoc cref="ExtronDeviceCommunicatorBase{T}.HandleIncomingResponse(string, string)" />
+        protected override void HandleIncomingResponse(string lastCommand, string response)
         {
             if (string.IsNullOrWhiteSpace(response) || string.IsNullOrEmpty(response)) return;
             if (IsResponseError(response))

@@ -23,6 +23,7 @@ namespace SystemCommunicator.Communication
         private readonly ILogger<T> logger;
         private readonly IConfiguration configuration;
         private Action<string> errorHandler;
+        private string lastCommand;
 
         /// <inheritdoc cref="IExtronDeviceCommunicator.FirmwareVersion"/>
         public string FirmwareVersion { get; private set; }
@@ -121,18 +122,23 @@ namespace SystemCommunicator.Communication
         /// <param name="command">The command to write</param>
         protected void Write(string command)
         {
+            lock(this)
+            {
+                lastCommand = command;
+            }
             com.Write(command);
         }
 
         /// <summary>
         /// Handles the incoming response message
         /// </summary>
+        /// <param name="lastCommand">The last command that was sent over the wire</param>
         /// <param name="response">The response string to interpret</param>
         /// <remarks>
         /// This is not an exact implementation of every response code that the Extron system can send back.
         /// I only implemented what I felt was currently necessary
         /// </remarks>
-        protected abstract void HandleIncomingResponse(string response);
+        protected abstract void HandleIncomingResponse(string lastCommand, string response);
 
         /// <summary>
         /// Polls the serial port for incoming data
@@ -146,7 +152,13 @@ namespace SystemCommunicator.Communication
                     var dataLine = com.ReadLine();
                     if (!string.IsNullOrEmpty(dataLine))
                     {
-                        HandleIncomingResponse(dataLine);
+                        string cmd;
+                        lock(this)
+                        {
+                            cmd = lastCommand;
+                            lastCommand = string.Empty;
+                        }
+                        HandleIncomingResponse(cmd, dataLine);
                     }
                 }
                 catch (TimeoutException te)
