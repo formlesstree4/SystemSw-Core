@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using SystemCommunicator.Devices;
@@ -17,7 +18,9 @@ namespace SystemSw.Sharp.Tests.Crosspoint.Fakes
 
         private string response = "";
         private bool isDisposed = false;
-        private readonly string Identify = "V32X16 A32X16";
+        private readonly string Identify = "V2X2 A2X2";
+        private readonly Regex tieRegexInput = new(@"(\d+)\*(\d+)(!|&|%|\$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex tieRegexOutput = new(@"(\d+)(!|&|%|\$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public bool IsOpen { get; private set; }
 
@@ -65,14 +68,45 @@ namespace SystemSw.Sharp.Tests.Crosspoint.Fakes
                 case 'i':
                     response = Identify;
                     break;
+                case 'Q':
+                case 'q':
+                    response = "1.337";
+                    break;
             }
+
+            if (tieRegexInput.IsMatch(text))
+            {
+                var matches = tieRegexInput.Match(text).Groups;
+                if (int.TryParse(matches[1].Value, out var input) && int.TryParse(matches[2].Value, out var output))
+                {
+                    response = $"Out{output} In{input} {MapToEnglish(matches[3].Value)}";
+                }
+                return;
+            }
+
+            if (tieRegexOutput.IsMatch(text))
+            {
+                response = "00";
+            }
+
             return;
         }
-
 
         private void AssertDisposed()
         {
             if (isDisposed) throw new System.ObjectDisposedException($"{nameof(FakeCommunicationDevice)}");
+        }
+
+        private static string MapToEnglish(string input)
+        {
+            return input switch
+            {
+                "!" => "All",
+                "&" => "RGB",
+                "%" => "Vid",
+                "$" => "Aud",
+                _ => ""
+            };
         }
 
     }

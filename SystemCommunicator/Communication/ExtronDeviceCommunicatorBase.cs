@@ -26,7 +26,7 @@ namespace SystemCommunicator.Communication
         private string lastCommand;
 
         /// <inheritdoc cref="IExtronDeviceCommunicator.FirmwareVersion"/>
-        public string FirmwareVersion { get; private set; }
+        public string FirmwareVersion { get; protected set; }
 
         /// <inheritdoc cref="IExtronDeviceCommunicator.IsConnectionOpen"/>
         public bool IsConnectionOpen => com.IsOpen;
