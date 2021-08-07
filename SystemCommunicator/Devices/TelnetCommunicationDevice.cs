@@ -18,6 +18,7 @@ namespace SystemCommunicator.Devices
         private readonly TcpClient telnetClient;
         private readonly string ipAddress;
         private readonly int port;
+        private readonly string password;
         private readonly ILogger<TelnetCommunicationDevice> logger;
         private readonly IPEndPoint endpoint;
 
@@ -37,6 +38,7 @@ namespace SystemCommunicator.Devices
             this.logger = logger;
             this.ipAddress = settings.IpAddress;
             this.port = settings.Port;
+            this.password = settings.Password;
             if (!IPEndPoint.TryParse($"{ipAddress}:{port}", out var ip))
             {
                 logger.LogError($"Could not parse {ipAddress}:{port} into an instance of ${nameof(System.Net.IPEndPoint)}");
@@ -63,6 +65,7 @@ namespace SystemCommunicator.Devices
         {
             logger.LogTrace("Opening Connection");
             telnetClient.Connect(endpoint);
+            HandleAuthentication();
             IsOpen = true;
         }
 
@@ -88,6 +91,15 @@ namespace SystemCommunicator.Devices
             logger.LogTrace($"Write('{text}')");
             using var sw = new StreamWriter(telnetClient.GetStream(), leaveOpen: true);
             sw.WriteLine(text);
+        }
+
+
+        private void HandleAuthentication()
+        {
+            if (!string.IsNullOrEmpty(password))
+            {
+                Write(password);
+            }
         }
 
         private static TelnetCommunicationSettings GetSettings(IConfiguration configuration)
