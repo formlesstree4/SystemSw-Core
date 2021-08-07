@@ -1,15 +1,11 @@
+using Crosspoint.Communicator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SystemCommunicator.Devices;
 
 namespace Crosspoint.Api
 {
@@ -31,6 +27,18 @@ namespace Crosspoint.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Crosspoint.Api", Version = "v1" });
             });
+            services.AddSingleton<SerialCommunicationDevice>();
+            services.AddSingleton<TelnetCommunicationDevice>();
+            services.AddSingleton<ICommunicationDevice>((provider) =>
+            {
+                return Configuration.GetSection("Extron")["Mode"]?.ToLowerInvariant() switch
+                {
+                    "serial" => provider.GetRequiredService<SerialCommunicationDevice>(),
+                    "telnet" => provider.GetRequiredService<TelnetCommunicationDevice>(),
+                    _ => throw new System.ArgumentOutOfRangeException("Mode", "Invalid Mode Specified")
+                };
+            });
+            services.AddSingleton<ExtronCrosspointCommunicator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,11 +50,13 @@ namespace Crosspoint.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Crosspoint.Api v1"));
             }
-
+            app.UseCors((b) => {
+                b.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
+            });
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

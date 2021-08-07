@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -31,7 +30,7 @@ namespace SystemSw.Sharp.Tests.Crosspoint
             var identify = $"V{input}X{output} A{input}X{output}";
             var ecc = new ExtronCrosspointCommunicator(new Fakes.FakeCommunicationDevice(identify), logger, GetConfiguration(false));
             ecc.OpenConnection();
-            SpinWait.SpinUntil(() => ecc.IsSystemReady, Timeout.Infinite);
+            ecc.WaitUntilReady();
             Assert.Equal(input, ecc.Inputs);
             Assert.Equal(output, ecc.Outputs);
         }
@@ -45,7 +44,7 @@ namespace SystemSw.Sharp.Tests.Crosspoint
         {
             var ecc = new ExtronCrosspointCommunicator(new Fakes.FakeCommunicationDevice(), logger, GetConfiguration(false));
             ecc.OpenConnection();
-            SpinWait.SpinUntil(() => ecc.IsSystemReady, Timeout.Infinite);
+            ecc.WaitUntilReady();
             Assert.Equal(0, ecc.Mappings[output].VideoInput);
             Assert.Equal(0, ecc.Mappings[output].AudioInput);
             ecc.MapInputToOutput(input, output, type);

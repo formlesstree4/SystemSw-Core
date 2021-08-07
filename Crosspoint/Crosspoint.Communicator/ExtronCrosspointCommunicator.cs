@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using SystemCommunicator.Communication;
 using SystemCommunicator.Communication.Results;
@@ -150,6 +151,22 @@ namespace Crosspoint.Communicator
             return CommunicationResult.Ok();
         }
 
+        /// <summary>
+        /// Waits until <see cref="ExtronCrosspointCommunicator"/> is ready to communicate with the attached device
+        /// </summary>
+        public void WaitUntilReady()
+        {
+            SpinWait.SpinUntil(() => IsSystemReady, Timeout.Infinite);
+        }
+
+        /// <summary>
+        /// Asynchronously waits until <see cref="ExtronCrosspointCommunicator"/> is ready to communicate with the attached device
+        /// </summary>
+        /// <returns></returns>
+        public async Task WaitUntilReadyAsync()
+        {
+            await Task.Run(WaitUntilReady);
+        }
 
 
         private void UpdateInternalMapping(int output, int input, MappingTypeEnum mappingType)
@@ -179,13 +196,13 @@ namespace Crosspoint.Communicator
         {
             // The documentation states that there are an equal number of inputs
             // and outputs for the Crosspoint 450 Plus. If this changes, we can
-            // 'easily' revert and deal with this. The mappings setup will become
+            // sorta revert and deal with this. The mappings setup will become
             // pretty fucking awkward but that's quite alright
             var matches = identityRegex.Matches(identifyString)[0].Groups;
             Inputs = int.Parse(matches[1].Value);
             Outputs = int.Parse(matches[2].Value);
             SetupOutputMappings();
-            QuerySystemForPortStatus();
+            _ = QuerySystemForPortStatus();
         }
 
         private void SetupOutputMappings()
@@ -197,21 +214,24 @@ namespace Crosspoint.Communicator
             }
         }
 
-        private void QuerySystemForPortStatus()
+        private async Task QuerySystemForPortStatus()
         {
             for (var index = 1; index <= Outputs; index++)
             {
                 Write($"{index}%");
-                Task.Delay(150).Wait();
+                await Task.Delay(150);
                 Write($"{index}$");
-                Task.Delay(150).Wait();
+                await Task.Delay(150);
             }
             IsSystemReady = true;
         }
 
         private void QuerySystemForMuteStatus()
         {
-            // Write("")
+            // I'll implement this if it becomes necessary
+            // but I don't think anyone actually uses this
+            // at the moment; perhaps one day
+            throw new NotImplementedException();
         }
 
 
