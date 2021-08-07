@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.Ui", "SystemSw-UI\System8.Ui.csproj", "{F604A41E-C3B0-4AB1-A028-04F3603D5A8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.Ui", "System8\System8.Ui\System8.Ui.csproj", "{F604A41E-C3B0-4AB1-A028-04F3603D5A8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.Api", "SystemSw-Api\System8.Api.csproj", "{CAB5EF67-7E8B-433E-99B3-3F0A57845676}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemSw.Sharp.Tests", "SystemSw-Tests\SystemSw.Sharp.Tests.csproj", "{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.Api", "System8\System8.Api\System8.Api.csproj", "{CAB5EF67-7E8B-433E-99B3-3F0A57845676}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System8", "System8", "{6C6E12C5-1DD1-404C-B8AB-E9533B93AE8E}"
 EndProject
@@ -15,11 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Crosspoint", "Crosspoint", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{2DEF517E-6C18-4D83-82D8-B6DBE565784A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemCommunicator", "SystemCommunicator\SystemCommunicator.csproj", "{108C1D47-73B0-4F99-B69B-224F582469B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemCommunicator", "SystemCommunicator\SystemCommunicator.csproj", "{108C1D47-73B0-4F99-B69B-224F582469B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System8.Communicator", "System8Communicator\System8.Communicator.csproj", "{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.Communicator", "System8\System8Communicator\System8.Communicator.csproj", "{D75D9CBE-CBF1-45DB-9DFC-2C150304F730}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crosspoint.Communicator", "Crosspoint.Communicator\Crosspoint.Communicator.csproj", "{795C30F0-74F2-4547-9046-F5D39EA69345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crosspoint.Communicator", "Crosspoint\Crosspoint.Communicator\Crosspoint.Communicator.csproj", "{795C30F0-74F2-4547-9046-F5D39EA69345}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemSw.Sharp.Tests", "SystemSw.Sharp.Tests\SystemSw.Sharp.Tests.csproj", "{F0226713-6EEC-4DC3-A36E-18DCC51258F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,6 @@ Global
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAB5EF67-7E8B-433E-99B3-3F0A57845676}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EFC2D1D-F545-44FE-BE1B-9751BC5679AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{108C1D47-73B0-4F99-B69B-224F582469B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{108C1D47-73B0-4F99-B69B-224F582469B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{108C1D47-73B0-4F99-B69B-224F582469B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{795C30F0-74F2-4547-9046-F5D39EA69345}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{795C30F0-74F2-4547-9046-F5D39EA69345}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{795C30F0-74F2-4547-9046-F5D39EA69345}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0226713-6EEC-4DC3-A36E-18DCC51258F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0226713-6EEC-4DC3-A36E-18DCC51258F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0226713-6EEC-4DC3-A36E-18DCC51258F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0226713-6EEC-4DC3-A36E-18DCC51258F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

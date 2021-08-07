@@ -39,8 +39,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Crosspoint.Communicator\Crosspoint.Communicator.csproj" />
-    <ProjectReference Include="..\System8Communicator\System8.Communicator.csproj" />
+    <ProjectReference Include="..\Crosspoint\Crosspoint.Communicator\Crosspoint.Communicator.csproj" />
+    <ProjectReference Include="..\System8\System8Communicator\System8.Communicator.csproj" />
     <ProjectReference Include="..\SystemCommunicator\SystemCommunicator.csproj" />
   </ItemGroup>
 
