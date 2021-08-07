@@ -1,4 +1,4 @@
-name: Build And Setup Tag
+name: SystemSw.Sharp
 on:
   push:
     branches:
@@ -29,8 +29,8 @@ jobs:
           release_name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
-  build_api:
-    name: Build, test, and Publish API
+  build_sys8_api:
+    name: Build, test, and Publish System8 API
     runs-on: ubuntu-latest
     needs: [tag]
     
@@ -48,37 +48,37 @@ jobs:
       uses: actions-ecosystem/action-get-latest-tag@v1
           
     - name: Restore dependencies
-      run: dotnet restore ./SystemSw-Api/System8.Api.csproj
+      run: dotnet restore ./System8/System8.Api/System8.Api.csproj
       
     - name: Build
-      run: dotnet build --no-restore ./SystemSw-Api/System8.Api.csproj
+      run: dotnet build --no-restore ./System8/System8.Api/System8.Api.csproj
       
     - name: Test
       run: dotnet test --no-build --verbosity normal
       
     - name: Publish API
       if: success()
-      run: dotnet publish -c Release -o ./Release-Api ./SystemSw-Api/System8.Api.csproj
+      run: dotnet publish -c Release -o ./Release/System8/Api ./System8/System8.Api/System8.Api.csproj
 
     - name: Zip API
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: './release-api-${{ github.sha }}.zip'
-        path: './Release-Api'
+        filename: './system8-api-${{ github.sha }}.zip'
+        path: './Release/System8/Api'
         
     - name: Upload API
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./release-api-${{ github.sha }}.zip"
+        artifacts: "./system8-api-${{ github.sha }}.zip"
         allowUpdates: 'true'
         commit: ${{ github.sha }}
         omitBody: 'true'
         tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
-  build_ui:
-    name: Build and Publish UI
+  build_sys8_ui:
+    name: Build and Publish System8 UI
     runs-on: ubuntu-latest
     needs: [tag]
 
@@ -101,26 +101,26 @@ jobs:
       uses: actions-ecosystem/action-get-latest-tag@v1
     
     - name: Restore dependencies
-      run: dotnet restore ./SystemSw-UI/System8.Ui.csproj
+      run: dotnet restore ./System8/System8.Ui/System8.Ui.csproj
       
     - name: Build
-      run: dotnet build --no-restore ./SystemSw-UI/System8.Ui.csproj
+      run: dotnet build --no-restore ./System8/System8.Ui/System8.Ui.csproj
       
     - name: Publish UI
       if: success()
-      run: dotnet publish -c Release -o ./Release-UI ./SystemSw-UI/System8.Ui.csproj
+      run: dotnet publish -c Release -o ./Release/System8/Ui ./System8/System8.Ui/System8.Ui.csproj
     
     - name: Zip UI
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: './release-ui-${{ github.sha }}.zip'
-        path: './Release-UI'
+        filename: './system8-ui-${{ github.sha }}.zip'
+        path: './Release/System8/Ui'
         
     - name: Upload UI
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "./release-ui-${{ github.sha }}.zip"
+        artifacts: "./system8-ui-${{ github.sha }}.zip"
         allowUpdates: 'true'
         commit: ${{ github.sha }}
         tag: ${{ steps.previoustag.outputs.tag }}
