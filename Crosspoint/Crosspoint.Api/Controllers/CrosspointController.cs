@@ -9,16 +9,12 @@ namespace Crosspoint.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class CrosspointController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<CrosspointController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public CrosspointController(ILogger<CrosspointController> logger)
         {
             _logger = logger;
         }
