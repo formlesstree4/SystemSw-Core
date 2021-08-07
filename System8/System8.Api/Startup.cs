@@ -27,13 +27,11 @@ namespace SystemSw_Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SystemSW WebAPI", Version = "v1" });
             });
             services.AddSingleton<SerialCommunicationDevice>();
-            services.AddSingleton<TelnetCommunicationDevice>();
             services.AddSingleton<ICommunicationDevice>((provider) =>
             {
                 return Configuration.GetSection("Extron")["Mode"]?.ToLowerInvariant() switch
                 {
                     "serial" => provider.GetRequiredService<SerialCommunicationDevice>(),
-                    "telnet" => provider.GetRequiredService<TelnetCommunicationDevice>(),
                     _ => throw new System.ArgumentOutOfRangeException("Mode", "Invalid Mode Specified")
                 };
             });
