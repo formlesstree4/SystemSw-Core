@@ -125,3 +125,100 @@ jobs:
         commit: ${{ github.sha }}
         tag: ${{ steps.previoustag.outputs.tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
+
+  build_crosspoint_api:
+    name: Build, test, and Publish Crosspoint API
+    runs-on: ubuntu-latest
+    needs: [tag]
+    
+    steps:    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+          
+    - name: Restore dependencies
+      run: dotnet restore ./Crosspoint/Crosspoint.Api/Crosspoint.Api.csproj
+      
+    - name: Build
+      run: dotnet build --no-restore ./Crosspoint/Crosspoint.Api/Crosspoint.Api.csproj
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      
+    - name: Publish API
+      if: success()
+      run: dotnet publish -c Release -o ./Release/Crosspoint/Api ./Crosspoint/Crosspoint.Api/Crosspoint.Api.csproj
+
+    - name: Zip API
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: './crosspoint-api-${{ github.sha }}.zip'
+        path: './Release/Crosspoint/Api'
+        
+    - name: Upload API
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./crosspoint-api-${{ github.sha }}.zip"
+        allowUpdates: 'true'
+        commit: ${{ github.sha }}
+        omitBody: 'true'
+        tag: ${{ steps.previoustag.outputs.tag }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  build_crosspoint_ui:
+    name: Build and Publish Crosspoint UI
+    runs-on: ubuntu-latest
+    needs: [tag]
+
+    steps:
+    - name: Setup NPM
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+    
+    - name: Restore dependencies
+      run: dotnet restore ./Crosspoint/Crosspoint.Ui/Crosspoint.Ui.csproj
+      
+    - name: Build
+      run: dotnet build --no-restore ./Crosspoint/Crosspoint.Ui/Crosspoint.Ui.csproj
+      
+    - name: Publish UI
+      if: success()
+      run: dotnet publish -c Release -o ./Release/Crosspoint/Ui ./Crosspoint/Crosspoint.Ui/Crosspoint.Ui.csproj
+    
+    - name: Zip UI
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: './crosspoint-ui-${{ github.sha }}.zip'
+        path: './Release/Crosspoint/Ui'
+        
+    - name: Upload UI
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./crosspoint-ui-${{ github.sha }}.zip"
+        allowUpdates: 'true'
+        commit: ${{ github.sha }}
+        tag: ${{ steps.previoustag.outputs.tag }}
+        token: ${{ secrets.GITHUB_TOKEN }}
