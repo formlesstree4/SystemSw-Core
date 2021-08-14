@@ -1,7 +1,9 @@
 ﻿using Crosspoint.Communicator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Crosspoint.Api.Controllers
 {
@@ -11,29 +13,31 @@ namespace Crosspoint.Api.Controllers
     {
 
         private readonly ILogger<CrosspointController> _logger;
+        private readonly IConfiguration configuration;
         private readonly ExtronCrosspointCommunicator communicator;
 
         public CrosspointController(
             ILogger<CrosspointController> logger,
+            IConfiguration configuration,
             ExtronCrosspointCommunicator communicator)
         {
             _logger = logger;
+            this.configuration = configuration;
             this.communicator = communicator;
+            this.communicator.WaitUntilReady();
         }
 
         [HttpGet]
-        public IEnumerable<Models.CrosspointMapping> Get()
-        {
-            var mappings = new List<Models.CrosspointMapping>();
-            if (!communicator.IsSystemReady)
+        public IEnumerable<Models.CrosspointMapping> Get() =>
+            communicator.Mappings.Select(mapping =>
             {
-                return null;
-            }
-            foreach(var mapping in communicator.Mappings)
-            {
+                return new Models.CrosspointMapping
+                {
+                    AudioInput = mapping.Value.AudioInput,
+                    VideoInput = mapping.Value.VideoInput,
+                    Output = mapping.Key,
 
-            }
-            return mappings;
-        }
+                };
+            });
     }
 }
