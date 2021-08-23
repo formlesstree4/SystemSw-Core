@@ -27,7 +27,7 @@ namespace System8.Api.Controllers
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.ec = ec ?? throw new ArgumentNullException(nameof(ec));
             this.mappings = new Dictionary<string, string>();
-            configuration.GetSection("ChannelMappings").Bind(this.mappings);
+            configuration.GetSection("Extron").GetSection("Inputs").Bind(this.mappings);
         }
 
         [HttpGet]
