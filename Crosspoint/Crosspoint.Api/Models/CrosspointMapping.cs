@@ -8,11 +8,6 @@
     {
 
         /// <summary>
-        /// Gets or sets the name of the mapping
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         /// Gets or sets the output port number
         /// </summary>
         public int Output { get; set; }
