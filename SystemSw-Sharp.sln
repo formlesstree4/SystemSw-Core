@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crosspoint.Communicator", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemSw.Sharp.Tests", "SystemSw.Sharp.Tests\SystemSw.Sharp.Tests.csproj", "{F0226713-6EEC-4DC3-A36E-18DCC51258F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crosspoint.Api", "Crosspoint\Crosspoint.Api\Crosspoint.Api.csproj", "{63D98E1D-DCAA-4E2A-817A-C93283578EF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crosspoint.Api", "Crosspoint\Crosspoint.Api\Crosspoint.Api.csproj", "{63D98E1D-DCAA-4E2A-817A-C93283578EF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crosspoint.Ui", "Crosspoint\Crosspoint.Ui\Crosspoint.Ui.csproj", "{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crosspoint.Ui", "Crosspoint\Crosspoint.Ui\Crosspoint.Ui.csproj", "{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System8.React", "System8\System8.React\System8.React.csproj", "{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{795C30F0-74F2-4547-9046-F5D39EA69345} = {94F36A20-03C3-402C-8B59-FC1F5B653C12}
 		{63D98E1D-DCAA-4E2A-817A-C93283578EF8} = {94F36A20-03C3-402C-8B59-FC1F5B653C12}
 		{123499D8-EEA1-44FC-9DF2-7F84E9DE76CD} = {94F36A20-03C3-402C-8B59-FC1F5B653C12}
+		{AD40EF95-A4B7-4EEC-B1B3-61D3A4E009DF} = {6C6E12C5-1DD1-404C-B8AB-E9533B93AE8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40758A8F-C4A8-44D4-9D1D-F33C14F638E7}
