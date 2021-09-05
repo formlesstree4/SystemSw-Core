@@ -6,6 +6,10 @@ export class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {mappings: [], loading: false};
+
+    this.onItemClick.bind(this);
+    this.getClassName.bind(this);
+    this.fetchMappings.bind(this);
   }
 
   componentDidMount() {
@@ -25,11 +29,11 @@ export class Home extends Component {
       <div className="container">
         <ul>
           {this.state.mappings.map(mapping =>
-            <li className={this.getClassName(mapping)} onClick={this.onItemClick.bind(this, mapping)}>{mapping.channelName}</li>  
+            <li className={this.getClassName} onClick={this.onItemClick}>{mapping.channelName}</li>  
           )}
         </ul>
         <ul>
-          <li onClick={this.fetchMappings.bind(this)}>Refresh</li>
+          <li onClick={this.fetchMappings}>Refresh</li>
         </ul>
       </div>
     )
