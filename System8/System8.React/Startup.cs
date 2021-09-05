@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System8.Communicator;
+using SystemCommunicator.Devices;
 
 namespace System8.React
 {
@@ -19,10 +21,17 @@ namespace System8.React
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
-
-            // In production, the React files will be served from this directory
+            services.AddSingleton<SerialCommunicationDevice>();
+            services.AddSingleton<ExtronSystem8Communicator>();
+            services.AddSingleton<ICommunicationDevice>((provider) =>
+            {
+                return Configuration.GetSection("Extron")["Mode"]?.ToLowerInvariant() switch
+                {
+                    "serial" => provider.GetRequiredService<SerialCommunicationDevice>(),
+                    _ => throw new System.ArgumentOutOfRangeException("Mode", "Invalid Mode Specified")
+                };
+            });
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
@@ -40,19 +49,20 @@ namespace System8.React
             {
                 app.UseExceptionHandler("/Error");
             }
-
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-
+            app.UseCors((b) => {
+                b.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
+            });
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";

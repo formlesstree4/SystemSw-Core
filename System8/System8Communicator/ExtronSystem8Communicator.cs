@@ -218,6 +218,7 @@ namespace System8.Communicator
                 }
                 return;
             }
+            Logger.LogInformation($"Incoming Response: {response} (theoretical last command: {lastCommand})");
 
             // let's handle all the permutations I care about
             switch (response[0])
@@ -288,7 +289,7 @@ namespace System8.Communicator
         private void HandleIdentifyString(string identifyResponse)
         {
             var responseArray = identifyResponse.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
+            Logger.LogInformation($"Identify: {identifyResponse}");
             /*
                 The response to identifying is as follows:
 

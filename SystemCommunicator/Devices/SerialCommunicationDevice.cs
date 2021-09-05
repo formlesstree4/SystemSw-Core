@@ -16,8 +16,10 @@ namespace SystemCommunicator.Devices
         private readonly SerialPort sp;
         private readonly Stack<string> history;
         private readonly ILogger<SerialCommunicationDevice> logger;
+        private bool shouldBeOpen = false;
 
-        public bool IsOpen => sp.IsOpen;
+
+        public bool IsOpen => sp.IsOpen && shouldBeOpen;
 
         public Stack<string> History => history;
 
@@ -31,7 +33,9 @@ namespace SystemCommunicator.Devices
             IConfiguration configuration,
             ILogger<SerialCommunicationDevice> logger)
         {
+            this.logger = logger;
             var settings = GetSettings(configuration);
+            logger.LogInformation($"AutoOpen: {settings.AutoOpen}; Port: {settings.Port}");
             sp = new SerialPort(settings.Port)
             {
                 BaudRate = 9600,
@@ -44,38 +48,38 @@ namespace SystemCommunicator.Devices
                 ReadTimeout = settings.ReadTimeout,
                 WriteTimeout = settings.WriteTimeout
             };
-            if (settings.AutoOpen) Open();
-            this.logger = logger;
         }
 
 
         public void Close()
         {
-            logger.LogTrace("Closing Connection");
+            logger.LogInformation("Closing Connection");
+            shouldBeOpen = false;
             sp.Close();
         }
 
         public void Dispose()
         {
-            logger.LogTrace("Dispose()");
+            logger.LogInformation("Dispose()");
             sp.Dispose();
         }
 
         public void Open()
         {
-            logger.LogTrace("Opening Connection");
+            logger.LogInformation("Opening Connection");
+            shouldBeOpen = true;
             sp.Open();
         }
 
         public string ReadLine()
         {
-            logger.LogTrace("ReadLine()");
+            logger.LogInformation("ReadLine()");
             return sp.ReadLine();
         }
 
         public void Write(string text)
         {
-            logger.LogTrace($"Write('{text}')");
+            logger.LogInformation($"Write('{text}')");
             sp.Write(text);
         }
 

@@ -147,6 +147,7 @@ namespace SystemCommunicator.Communication
         {
             while (!source.IsCancellationRequested)
             {
+                logger.LogInformation("Begin Read Loop");
                 try
                 {
                     var dataLine = com.ReadLine();
@@ -158,6 +159,7 @@ namespace SystemCommunicator.Communication
                             cmd = lastCommand;
                             lastCommand = string.Empty;
                         }
+                        logger.LogInformation($"Command: {dataLine}");
                         HandleIncomingResponse(cmd, dataLine);
                     }
                 }

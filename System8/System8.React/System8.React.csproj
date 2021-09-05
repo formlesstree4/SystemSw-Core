@@ -11,7 +11,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SystemCommunicator\SystemCommunicator.csproj" />
+    <ProjectReference Include="..\System8Communicator\System8.Communicator.csproj" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->

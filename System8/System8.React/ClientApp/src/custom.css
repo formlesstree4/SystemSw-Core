@@ -12,3 +12,17 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+ul {
+  list-style-type: none;
+  border: 1px solid black;
+  padding: 0px;
+}
+
+li {
+  text-align: center;
+}
+
+li.selected {
+  font-weight: bolder;   
+}

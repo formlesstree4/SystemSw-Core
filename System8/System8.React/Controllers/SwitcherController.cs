@@ -1,0 +1,70 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System8.React.Models;
+using System8.Communicator;
+
+
+namespace System8.React.Controllers
+{
+
+    [ApiController]
+    [Route("[controller]")]
+    public sealed class SwitcherController : ControllerBase
+    {
+        
+
+        private readonly ILogger<SwitcherController> logger;
+        private readonly ExtronSystem8Communicator ec;
+        private readonly Dictionary<string, string> mappings;
+
+
+        public SwitcherController(
+            IConfiguration configuration,
+            ILogger<SwitcherController> logger,
+            ExtronSystem8Communicator ec)
+        {
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.ec = ec ?? throw new ArgumentNullException(nameof(ec));
+            this.mappings = new Dictionary<string, string>();
+            configuration.GetSection("Extron").GetSection("Inputs").Bind(this.mappings);
+        }
+
+        [HttpGet]
+        public IEnumerable<ExtronMappedEntry> Get()
+        {
+            return GetExtronMappings();
+        }
+
+        [HttpPost]
+        public async Task<IEnumerable<ExtronMappedEntry>> Post([FromBody]ExtronMappedEntry entry)
+        {
+            ec.ChangeChannel(entry.Channel);
+            await Task.Delay(100);
+            return GetExtronMappings();
+        }
+
+        private IEnumerable<ExtronMappedEntry> GetExtronMappings()
+        {
+            var coll = new List<ExtronMappedEntry>();
+            logger.LogInformation($"Generating Mappings for {ec.Channels} entries");
+            for (var c = 0; c < ec.Channels; c++)
+            {
+                var cs = (c + 1).ToString();
+                var eme = new ExtronMappedEntry()
+                {
+                    Channel = c + 1,
+                    ChannelName = mappings.ContainsKey(cs) ? mappings[cs] : "?",
+                    IsActiveChannel = c + 1 == ec.VideoChannel
+                };
+                coll.Add(eme);
+            }
+            return coll;
+        }
+
+    }
+
+}
