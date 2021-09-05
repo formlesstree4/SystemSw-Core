@@ -14,14 +14,11 @@ namespace SystemCommunicator.Devices
     {
 
         private readonly SerialPort sp;
-        private readonly Stack<string> history;
         private readonly ILogger<SerialCommunicationDevice> logger;
         private bool shouldBeOpen = false;
 
 
         public bool IsOpen => sp.IsOpen && shouldBeOpen;
-
-        public Stack<string> History => history;
 
 
         /// <summary>
