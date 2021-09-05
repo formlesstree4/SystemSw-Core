@@ -83,12 +83,25 @@ namespace SystemCommunicator.Communication
         /// <inheritdoc cref="IExtronDeviceCommunicator.OpenConnection"/>
         public virtual ICommunicationResult OpenConnection()
         {
-            if (com.IsOpen) return CommunicationResult.Error("connection already open", ResultCode.Unknown, false);
-            com.Open();
-            source = new CancellationTokenSource();
-            readLoop = Task.Run(InternalReadLoop);
-            Identify();
-            return CommunicationResult.Ok();
+            if (!com.IsOpen)
+            {
+                com.Open();
+            }
+            else
+            {
+                logger.LogTrace("OpenConnection() was called even though the device was already open.");
+            }
+            if (source == null || source.IsCancellationRequested)
+            {
+                source = new CancellationTokenSource();
+                readLoop = Task.Run(InternalReadLoop);
+                Identify();
+                return CommunicationResult.Ok();
+            }
+            else
+            {
+                return CommunicationResult.Error("connection already open", ResultCode.Unknown, false);
+            }
         }
 
         /// <summary>
