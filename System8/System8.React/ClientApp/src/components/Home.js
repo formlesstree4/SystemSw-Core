@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Button from 'react-bootstrap/Button';
 
 export class Home extends Component {
   static displayName = Home.name;
@@ -6,10 +7,6 @@ export class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {mappings: [], loading: false};
-
-    this.onItemClick.bind(this);
-    this.getClassName.bind(this);
-    this.fetchMappings.bind(this);
   }
 
   componentDidMount() {
@@ -26,24 +23,26 @@ export class Home extends Component {
 
   renderMappingList() {
     return (
-      <div className="container">
-        <ul>
-          {this.state.mappings.map(mapping =>
-            <li className={this.getClassName} onClick={this.onItemClick}>{mapping.channelName}</li>  
-          )}
-        </ul>
-        <ul>
-          <li onClick={this.fetchMappings}>Refresh</li>
-        </ul>
+      <div className="d-grid gap-2">
+        {this.state.mappings.map(mapping =>
+          <Button variant={this.getVariant(mapping)} size="lg" onClick={() => this.onItemClick(mapping)}>{mapping.channelName}</Button>
+        )}
+
+        <br />
+        <Button variant="primary" size="lg" onClick={() => this.fetchMappings()}>Refresh</Button>
+
+        {/* <Button variant="primary" size="lg">
+          Block level button
+        </Button>
+        <Button variant="secondary" size="lg">
+          Block level button
+        </Button> */}
       </div>
     )
   }
 
-  getClassName(mapping) {
-    if (mapping.isSelected) {
-      return 'selected';
-    }
-    return '';
+  getVariant(mapping) {
+    return mapping.isActiveChannel ? "primary" : "secondary";
   }
 
   async fetchMappings() {
@@ -57,6 +56,9 @@ export class Home extends Component {
     this.setState({loading: true});
     const response = await fetch('switcher', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(entry)
     });
     const data = await response.json();

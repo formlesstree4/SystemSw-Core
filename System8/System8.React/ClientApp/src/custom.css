@@ -16,13 +16,19 @@ code {
 ul {
   list-style-type: none;
   border: 1px solid black;
-  padding: 0px;
+  padding: 1px;
+  margin: 4px;
 }
 
 li {
   text-align: center;
+  margin: 4px;
 }
 
 li.selected {
   font-weight: bolder;   
+}
+
+li.notSelected {
+  font-style: italic;
 }

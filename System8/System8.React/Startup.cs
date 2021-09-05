@@ -23,12 +23,14 @@ namespace System8.React
         {
             services.AddControllersWithViews();
             services.AddSingleton<SerialCommunicationDevice>();
+            services.AddSingleton<FakeCommunicationDevice>();
             services.AddSingleton<ExtronSystem8Communicator>();
             services.AddSingleton<ICommunicationDevice>((provider) =>
             {
                 return Configuration.GetSection("Extron")["Mode"]?.ToLowerInvariant() switch
                 {
                     "serial" => provider.GetRequiredService<SerialCommunicationDevice>(),
+                    "development" => provider.GetRequiredService<FakeCommunicationDevice>(),
                     _ => throw new System.ArgumentOutOfRangeException("Mode", "Invalid Mode Specified")
                 };
             });
