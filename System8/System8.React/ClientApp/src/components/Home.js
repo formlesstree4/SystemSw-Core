@@ -30,13 +30,6 @@ export class Home extends Component {
 
         <br />
         <Button variant="primary" size="lg" onClick={() => this.fetchMappings()}>Refresh</Button>
-
-        {/* <Button variant="primary" size="lg">
-          Block level button
-        </Button>
-        <Button variant="secondary" size="lg">
-          Block level button
-        </Button> */}
       </div>
     )
   }
