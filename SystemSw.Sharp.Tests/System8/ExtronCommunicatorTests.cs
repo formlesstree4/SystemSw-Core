@@ -28,6 +28,22 @@ namespace SystemSw.Sharp.Tests.System8
             Assert.Equal(shouldBeOpen, ec.IsConnectionOpen);
         }
 
+
+        [Fact(DisplayName = "The communicator should handle an open communication device seamlessly")]
+        public async Task Test_CommunicatorHandlesAlreadyOpenedDevice()
+        {
+            var device = new Fakes.FakeCommunicationDevice();
+            device.Open();
+            Assert.True(device.IsOpen);
+
+            var ec = new ExtronSystem8Communicator(device, logger, GetConfiguration(false));
+            ec.OpenConnection();
+            ec.Identify();
+
+            await Task.Delay(100);
+            Assert.Equal(ec.Channels, 4);
+        }
+
         [Fact(DisplayName = "Verification string is parsed accordingly for System 8/10")]
         public async Task Test_VerificationStringIsParsedCorrectly()
         {
